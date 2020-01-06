@@ -1,0 +1,28 @@
+children: []
+variables: {}
+type: RequestStep
+assignVariables:
+  - assign:
+      type: reference
+      refNodePath: Project/First tests/create event
+    path: 'body.length'
+    variable: salaryCount2
+requestData:
+  request:
+    method: GET
+    url: '${$env.basePath}/api/eventsalary/'
+  headers: []
+  disabledInheritedHeaders: []
+  params: []
+  body:
+    type: Json
+    jsonBody: ''
+    xmlBody: ''
+    textBody: ''
+    formData: []
+    file: ''
+    formURLEncoded: []
+  strictSSL: Inherit
+authData:
+  type: inherit
+name: Remember events count again

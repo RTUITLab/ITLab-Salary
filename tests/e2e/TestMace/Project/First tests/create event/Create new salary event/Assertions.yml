@@ -1,0 +1,20 @@
+children: []
+variables: {}
+type: Assertion
+assertions:
+  - disabled: false
+    type: compare
+    actualValue: '${$response.body.count}'
+    operator: equal
+    expectedValue: '${newEventSalaryCount}'
+  - disabled: false
+    type: compare
+    actualValue: '${$response.body.description}'
+    operator: equal
+    expectedValue: '${newEventSalaryDescription}'
+  - disabled: false
+    type: compare
+    actualValue: '${$response.body.eventId}'
+    operator: equal
+    expectedValue: '${newEventSalaryEventId}'
+name: Assertions

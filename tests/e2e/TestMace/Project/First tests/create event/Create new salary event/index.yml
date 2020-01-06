@@ -1,0 +1,29 @@
+children:
+  - Assertions
+variables: {}
+type: RequestStep
+assignVariables: []
+requestData:
+  request:
+    method: POST
+    url: '${$env.basePath}/api/eventsalary'
+  headers: []
+  disabledInheritedHeaders: []
+  params: []
+  body:
+    type: Json
+    jsonBody: |-
+      {
+        "count":${newEventSalaryCount},
+        "description":"${newEventSalaryDescription}",
+        "eventId": "${newEventSalaryEventId}"
+      }
+    xmlBody: ''
+    textBody: ''
+    formData: []
+    file: ''
+    formURLEncoded: []
+  strictSSL: Inherit
+authData:
+  type: inherit
+name: Create new salary event

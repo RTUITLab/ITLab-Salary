@@ -34,7 +34,7 @@ namespace ITLab.Salary.Backend.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EventSalaryView>>> GetAsync()
         {
-            return await db.ShiftSalaries.AsNoTracking().Select(s => new EventSalaryView
+            return await db.EventSalaries.AsNoTracking().Select(s => new EventSalaryView
             {
                 Id = s.Id,
                 AuthorId = s.AuthorId,

@@ -1,0 +1,17 @@
+children: []
+variables: {}
+type: Assertion
+assertions:
+  - disabled: false
+    type: compare
+    actualValue: '${$response.code}'
+    operator: equal
+    expectedValue: '200'
+  - disabled: false
+    type: script
+    script: |-
+
+      const requestNode = tm.currentNode.parent;
+      assert(Array.isArray(requestNode.response.body), 'body must be aarray')
+    name: body is array
+name: Assertions

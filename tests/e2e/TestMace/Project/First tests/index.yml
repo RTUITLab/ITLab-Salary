@@ -1,0 +1,12 @@
+children:
+  - Get all event salary
+  - create event
+variables: {}
+type: Folder
+authData:
+  type: inherit
+requestData:
+  headers: []
+  disabledInheritedHeaders: []
+  strictSSL: Inherit
+name: First tests

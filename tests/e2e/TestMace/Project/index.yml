@@ -4,10 +4,11 @@ name: Project
 environments:
   environments:
     localEnv:
-      basePath: 'http://localhost:5000'
+      basePath: 'http://localhost:5003'
     e2e:
       basePath: 'http://test-salary-api:8080'
-children: []
+children:
+  - First tests
 variables: {}
 authData:
   type: inherit
