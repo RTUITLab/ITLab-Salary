@@ -5,12 +5,12 @@ assignVariables:
   - assign:
       type: reference
       refNodePath: Project/First tests/create event
-    path: 'body.length'
+    path: body.length
     variable: salaryCount2
 requestData:
   request:
     method: GET
-    url: '${$env.basePath}/api/eventsalary/'
+    url: '${$env.basePath}/salary/event/'
   headers: []
   disabledInheritedHeaders: []
   params: []

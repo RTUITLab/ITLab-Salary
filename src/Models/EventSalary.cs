@@ -4,8 +4,9 @@ using System.Text;
 
 namespace ITLab.Salary.Models
 {
-    public class EventSalary : Salary
+    public class EventSalary : RootSalary
     {
         public Guid EventId { get; set; }
+        public List<ShiftSalary> ShiftSalaries { get; set; }
     }
 }

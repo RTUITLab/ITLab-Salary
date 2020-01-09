@@ -5,4 +5,8 @@
     <RootNamespace>ITLab.Salary.Models</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MongoDB.Bson" Version="2.10.0" />
+  </ItemGroup>
+
 </Project>

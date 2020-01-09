@@ -10,31 +10,31 @@ using ITLab.Salary.PublicApi.Response;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Npgsql;
+using MongoDB.Driver;
 
 namespace ITLab.Salary.Backend.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("salary/event")]
     [ApiController]
     public class EventSalaryController : ControllerBase
     {
-        private readonly SalaryDbContext db;
+        private readonly SalaryContext salaryContext;
         private readonly ILogger<EventSalaryController> logger;
 
         public EventSalaryController(
-            SalaryDbContext salaryDbContext,
+            SalaryContext salaryContext,
             ILogger<EventSalaryController> logger)
         {
-            this.db = salaryDbContext;
+            this.salaryContext = salaryContext;
             this.logger = logger;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<EventSalaryView>>> GetAsync()
+        public async Task<ActionResult<IEnumerable<EventSalaryView>>> GetList()
         {
-            return await db.EventSalaries.AsNoTracking().Select(s => new EventSalaryView
+            return (await(await salaryContext.EventSalary.FindAsync(Builders<EventSalary>.Filter.Empty)
+                .ConfigureAwait(false)).ToListAsync().ConfigureAwait(false)).Select(s => new EventSalaryView
             {
                 Id = s.Id,
                 AuthorId = s.AuthorId,
@@ -42,32 +42,23 @@ namespace ITLab.Salary.Backend.Controllers
                 Created = s.Created,
                 Description = s.Description,
                 EventId = s.EventId
-            }).ToListAsync().ConfigureAwait(false);
+            }).ToList();
         }
 
-        // GET: api/EventSalary/5
-        [HttpGet("{id}", Name = "Get")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST: api/EventSalary
         [HttpPost]
-        public async Task<ActionResult<EventSalaryView>> PostAsync( [FromBody] EventSalaryCreate createRequest)
+        public async Task<ActionResult<EventSalaryView>> AddEventSalary([FromBody] EventSalaryCreate createRequest)
         {
             try
             {
                 var es = new EventSalary
                 {
                     AuthorId = Guid.NewGuid(),
-                    Created = DateTime.Now,
+                    Created = DateTime.UtcNow,
                     Count = createRequest.Count,
                     Description = createRequest.Description,
                     EventId = createRequest.EventId
                 };
-                db.EventSalaries.Add(es);
-                await db.SaveChangesAsync().ConfigureAwait(false);
+                await salaryContext.EventSalary.InsertOneAsync(es).ConfigureAwait(false);
                 return new EventSalaryView
                 {
                     Id = es.Id,
@@ -77,8 +68,8 @@ namespace ITLab.Salary.Backend.Controllers
                     Description = es.Description,
                     EventId = es.EventId
                 };
-            } catch (DbUpdateException ex) when
-            (ex.InnerException is PostgresException pe && pe.SqlState == "23505")
+            } catch (MongoWriteException ex) when
+            (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
             {
                 var msd = new ModelStateDictionary();
                 msd.AddModelError("eventId", "Salary for that event exists");
@@ -86,16 +77,6 @@ namespace ITLab.Salary.Backend.Controllers
             }
         }
 
-        // PUT: api/EventSalary/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+        
     }
 }

@@ -7,7 +7,6 @@ using ITLab.Salary.Database;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -25,19 +24,15 @@ namespace ITLab.Salary.Backend
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
 
-            services.AddDbContext<SalaryDbContext>(options =>
-                options.UseNpgsql(Configuration.GetConnectionString("Postgres"), options => options.MigrationsAssembly(nameof(Backend))));
-
+            services.AddTransient(s => new SalaryContext(s.GetRequiredService<IConfiguration>().GetConnectionString("MongoDb")));
             services.AddWebAppConfigure()
-                .AddTransientConfigure<MigrateWork>(0);
+                .AddTransientConfigure<MigrateMongoDbWork>(0);
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
