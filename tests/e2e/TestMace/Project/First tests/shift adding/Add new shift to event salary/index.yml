@@ -5,18 +5,14 @@ type: RequestStep
 assignVariables: []
 requestData:
   request:
-    method: POST
-    url: '${$env.basePath}/salary/event/${newEventSalaryEventId}'
+    method: PUT
+    url: '${$env.basePath}/salary/event/${newEventSalaryEventId}/${newShiftId}'
   headers: []
   disabledInheritedHeaders: []
   params: []
   body:
     type: Json
-    jsonBody: |-
-      {
-        "count":${newEventSalaryCount},
-        "description":"${newEventSalaryDescription}"
-      }
+    jsonBody: "{\r\n  \"count\": ${newShiftCount},\r\n  \"description\": \"${newShiftDescription}\"\r\n}"
     xmlBody: ''
     textBody: ''
     formData: []
@@ -25,4 +21,4 @@ requestData:
   strictSSL: Inherit
 authData:
   type: inherit
-name: Create new salary event
+name: Add new shift to event salary

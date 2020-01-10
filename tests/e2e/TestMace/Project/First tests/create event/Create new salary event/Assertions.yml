@@ -17,4 +17,9 @@ assertions:
     actualValue: '${$response.body.eventId}'
     operator: equal
     expectedValue: '${newEventSalaryEventId}'
+  - disabled: false
+    type: compare
+    actualValue: '${$response.code}'
+    operator: equal
+    expectedValue: '201'
 name: Assertions

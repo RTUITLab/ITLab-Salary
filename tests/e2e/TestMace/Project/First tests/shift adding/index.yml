@@ -1,0 +1,16 @@
+children:
+  - Check is no shifts in event salary
+  - Add new shift to event salary
+  - Cant add new shift salary with same id
+variables:
+  newShiftId: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+  newShiftCount: '140155'
+  newShiftDescription: shift description
+type: Folder
+authData:
+  type: inherit
+requestData:
+  headers: []
+  disabledInheritedHeaders: []
+  strictSSL: Inherit
+name: shift adding
