@@ -8,8 +8,14 @@ using System.Threading.Tasks;
 
 namespace ITLab.Salary.Backend.Formatting
 {
+    /// <summary>
+    /// Automapper profile for requests
+    /// </summary>
     public class Requests : Profile
     {
+        /// <summary>
+        /// Constructor with Maps
+        /// </summary>
         public Requests()
         {
 

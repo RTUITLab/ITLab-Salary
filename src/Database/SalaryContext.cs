@@ -3,10 +3,12 @@ using ITLab.Salary.Shared.Exceptions;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.Core.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ITLab.Salary.Database
@@ -24,7 +26,16 @@ namespace ITLab.Salary.Database
         {
             BsonDefaults.GuidRepresentation = GuidRepresentation.Standard;
             var connection = new MongoUrlBuilder(connectionString);
-            MongoClient client = new MongoClient(connectionString);
+            var mongoConnectionUrl = new MongoUrl(connectionString);
+            var mongoClientSettings = MongoClientSettings.FromUrl(mongoConnectionUrl);
+            mongoClientSettings.ClusterConfigurator = cb =>
+            {
+                cb.Subscribe<CommandStartedEvent>(e =>
+                {
+                    logger.LogDebug($"{e.CommandName} - {e.Command.ToJson()}");
+                });
+            };
+            MongoClient client = new MongoClient(mongoClientSettings);
             Database = client.GetDatabase(connection.DatabaseName);
             this.logger = logger;
         }
@@ -47,56 +58,48 @@ namespace ITLab.Salary.Database
             return EventSalary.Find(es => es.EventId == eventId).SingleOrDefaultAsync();
         }
 
-        public async Task AddNewEventSalary(EventSalary eventSalary, Guid authorId)
+        public async Task AddNewEventSalary(Guid eventId, EventSalary eventSalary, Guid authorId)
         {
-            try
+            eventSalary = eventSalary ?? throw new ArgumentNullException(nameof(eventSalary));
+            var now = DateTime.UtcNow;
+            eventSalary.EventId = eventId;
+            eventSalary.Created = eventSalary.ModificationDate = now;
+            eventSalary.AuthorId = authorId;
+            eventSalary.ShiftSalaries.ForEach(ss =>
             {
-                var now = DateTime.UtcNow;
-                eventSalary.Created = eventSalary.ModificationDate = now;
-                eventSalary.AuthorId = authorId;
-                eventSalary.ShiftSalaries.ForEach(ss =>
+                ss.Created = ss.ModificationDate = now;
+                ss.AuthorId = authorId;
+                ss.PlaceSalaries.ForEach(ps =>
                 {
-                    ss.Created = ss.ModificationDate = now;
-                    ss.AuthorId = authorId;
-                    ss.PlaceSalaries.ForEach(ps =>
-                    {
-                        ps.Created = ps.ModificationDate = now;
-                        ps.AuthorId = authorId;
-                        ps.UserSalaries = null;
-                    });
+                    ps.Created = ps.ModificationDate = now;
+                    ps.AuthorId = authorId;
+                    ps.UserSalaries = null;
                 });
-                await EventSalary.InsertOneAsync(eventSalary);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            try
-            {
-                await EventSalaryHistory.InsertOneAsync(eventSalary);
-            }
-            catch (Exception ex)
-            {
-                logger.LogWarning(ex, "Can't insert history record");
-            }
+            });
+            await EventSalary.InsertOneAsync(eventSalary).ConfigureAwait(false);
+            await EventSalaryHistory.InsertOneAsync(eventSalary).ConfigureAwait(false);
         }
 
         public async Task ChangeEventSalaryInfo(Guid eventId, Models.Salary info, Guid authorId)
         {
+            info = info ?? throw new ArgumentNullException(nameof(info));
+
             var result = await EventSalary.UpdateOneAsync(
                 es => es.EventId == eventId,
                 Builders<EventSalary>.Update
                     .Set(es => es.ModificationDate, DateTime.UtcNow)
                     .Set(es => es.AuthorId, authorId)
                     .Set(es => es.Description, info.Description)
-                    .Set(es => es.Count, info.Count));
+                    .Set(es => es.Count, info.Count)).ConfigureAwait(false);
             if (result.ModifiedCount == 0)
                 throw new NotFoundException();
         }
 
         public async Task AddShiftToEventSalary(Guid eventId, Guid shiftId, Models.Salary salary, Guid authorId)
         {
+            salary = salary ?? throw new ArgumentNullException(nameof(salary));
             var now = DateTime.UtcNow;
+
 
             var shiftSalary = new ShiftSalary
             {
@@ -108,10 +111,13 @@ namespace ITLab.Salary.Database
                 ModificationDate = now
             };
             var result = await EventSalary.UpdateOneAsync(
-                es => es.EventId == eventId,
+                Builders<EventSalary>.Filter.And(
+                    Builders<EventSalary>.Filter.Eq(es => es.EventId, eventId),
+                    Builders<EventSalary>.Filter.Ne($"{nameof(Models.EventSalary.ShiftSalaries)}.{nameof(Models.ShiftSalary.ShiftId)}", shiftId)
+                ),
                 Builders<EventSalary>.Update
                     .Push(es => es.ShiftSalaries, shiftSalary)
-                );
+                ).ConfigureAwait(false);
             if (result.ModifiedCount == 0)
                 throw new NotFoundException();
         }

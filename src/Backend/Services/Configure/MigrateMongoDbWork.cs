@@ -13,11 +13,19 @@ using System.Threading.Tasks;
 
 namespace ITLab.Salary.Backend.Services.Configure
 {
+    /// <summary>
+    /// Configure wor for apply mongo db migrations
+    /// </summary>
     public class MigrateMongoDbWork : IConfigureWork
     {
         private readonly ILogger<MigrateMongoDbWork> logger;
         private readonly SalaryContext salaryContext;
 
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="logger">Logger for provide logs</param>
+        /// <param name="salaryContext">Database context</param>
         public MigrateMongoDbWork(
             ILogger<MigrateMongoDbWork> logger,
             SalaryContext salaryContext)
@@ -26,6 +34,11 @@ namespace ITLab.Salary.Backend.Services.Configure
             this.salaryContext = salaryContext;
         }
 
+        /// <summary>
+        /// Read migrations from assembly and apply
+        /// </summary>
+        /// <param name="cancellationToken">Not uses</param>
+        /// <returns></returns>
         public async Task Configure(CancellationToken cancellationToken)
         {
             var appliedMigrations = await GetAppliedMigrations(salaryContext.Database).ConfigureAwait(false);
@@ -52,7 +65,12 @@ namespace ITLab.Salary.Backend.Services.Configure
         private Task SaveMigrationRecord(IMongoDatabase database, MongoMigration migration)
         {
             var migrations = database.GetCollection<MongoMigrationRecord>("__Migrations");
-            return migrations.InsertOneAsync(new MongoMigrationRecord { Name = migration.Name, MigrationDate = migration.MigrationDate });
+            return migrations.InsertOneAsync(new MongoMigrationRecord
+            {
+                Name = migration.Name,
+                MigrationId = migration.Id,
+                MigrationDate = migration.MigrationDate
+            });
         }
 
         private async Task<List<MongoMigrationRecord>> GetAppliedMigrations(IMongoDatabase database)

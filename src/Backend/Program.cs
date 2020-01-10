@@ -9,7 +9,9 @@ using Microsoft.Extensions.Logging;
 
 namespace ITLab.Salary.Backend
 {
-    public class Program
+#pragma warning disable CS1591
+
+    public static class Program
     {
         public static void Main(string[] args)
         {
@@ -23,4 +25,5 @@ namespace ITLab.Salary.Backend
                     webBuilder.UseStartup<Startup>();
                 });
     }
+#pragma warning restore CS1591
 }

@@ -17,6 +17,9 @@ using MongoDB.Driver;
 
 namespace ITLab.Salary.Backend.Controllers
 {
+    /// <summary>
+    /// Manage event salary
+    /// </summary>
     [Produces("application/json")]
     [Route("salary/event")]
     [ApiController]
@@ -26,6 +29,12 @@ namespace ITLab.Salary.Backend.Controllers
         private readonly IMapper mapper;
         private readonly ILogger<EventSalaryController> logger;
 
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="salaryContext"></param>
+        /// <param name="mapper"></param>
+        /// <param name="logger"></param>
         public EventSalaryController(
             SalaryContext salaryContext,
             IMapper mapper,
@@ -36,6 +45,10 @@ namespace ITLab.Salary.Backend.Controllers
             this.logger = logger;
         }
 
+        /// <summary>
+        /// Get all event salary models
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EventSalaryCompactView>>> GetList()
         {
@@ -44,8 +57,15 @@ namespace ITLab.Salary.Backend.Controllers
                 .ConfigureAwait(false);
         }
 
-        [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
+        /// <summary>
+        /// Get one full event salary by event id
+        /// </summary>
+        /// <param name="eventId">event id to search</param>
+        /// <response code="200">Returns the finded item</response>
+        /// <response code="404">Item not found</response>
+        /// <returns></returns>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("{eventId}")]
         public async Task<ActionResult<EventSalaryFullView>> GetOne(Guid eventId)
         {
@@ -57,17 +77,25 @@ namespace ITLab.Salary.Backend.Controllers
             return mapper.Map<EventSalaryFullView>(finded);
         }
 
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        [HttpPost]
-        public async Task<ActionResult<EventSalaryFullView>> AddEventSalary([FromBody] EventSalaryCreate createRequest)
+        /// <summary>
+        /// Add new event salary record
+        /// </summary>
+        /// <param name="eventId">Target event id</param>
+        /// <param name="createRequest">Info about event salary</param>
+        /// <response code="201">Returns the newly created item</response>
+        /// <response code="400">Event salary for thayt event exists</response>
+        /// <returns></returns>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [HttpPost("{eventId}")]
+        public async Task<ActionResult<EventSalaryFullView>> AddEventSalary(Guid eventId, [FromBody] EventSalaryCreate createRequest)
         {
             try
             {
                 var authorId = Guid.NewGuid();
                 var es = mapper.Map<EventSalary>(createRequest);
-                await salaryContext.AddNewEventSalary(es, authorId).ConfigureAwait(false);
-                return mapper.Map<EventSalaryFullView>(es);
+                await salaryContext.AddNewEventSalary(eventId, es, authorId).ConfigureAwait(false);
+                return CreatedAtAction(nameof(GetOne), new { eventId = es.EventId }, mapper.Map<EventSalaryFullView>(es));
             }
             catch (MongoWriteException ex) when
                   (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
@@ -77,11 +105,18 @@ namespace ITLab.Salary.Backend.Controllers
                 return BadRequest(msd);
             }
         }
-
+        /// <summary>
+        /// Update ONLY event salary info
+        /// </summary>
+        /// <param name="eventId">Target event id</param>
+        /// <param name="info">Info to update on event level</param>
+        /// <response code="200">Returns the updated info</response>
+        /// <response code="404">Event salary not found</response>
+        /// <returns></returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         [HttpPut("{eventId}")]
-        public async Task<ActionResult<EventSalaryFullView>> ChangeEventSalaryInfo(Guid eventId, [FromBody] SalaryInfo info)
+        public async Task<ActionResult<EventSalaryFullView>> UpdateEventSalaryInfo(Guid eventId, [FromBody] SalaryInfo info)
         {
             try
             {
@@ -95,6 +130,17 @@ namespace ITLab.Salary.Backend.Controllers
                 return NotFound();
             }
         }
+
+
+        /// <summary>
+        /// Add new shift to event salary
+        /// </summary>
+        /// <param name="eventId">Target event id</param>
+        /// <param name="shiftId">Target shift id</param>
+        /// <param name="info">New Shift salary info</param>
+        /// <response code="200">Returns the newly created item</response>
+        /// <response code="404">Event salary not found or shift id exists on that event</response>
+        /// <returns></returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         [HttpPut("{eventId}/{shiftId}")]

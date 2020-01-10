@@ -8,8 +8,14 @@ using System.Threading.Tasks;
 
 namespace ITLab.Salary.Backend.Formatting
 {
+    /// <summary>
+    /// Automapper profile for responses
+    /// </summary>
     public class Responses : Profile
     {
+        /// <summary>
+        /// Constructor with Maps
+        /// </summary>
         public Responses()
         {
             CreateMap<EventSalary, EventSalaryCompactView>();
