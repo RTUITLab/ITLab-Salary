@@ -16,6 +16,7 @@ namespace ITLab.Salary.Backend.MongoMigrations
 
         public override async Task DoChanges(IMongoDatabase database)
         {
+            database = database ?? throw new ArgumentNullException(nameof(database));
             await database.CreateCollectionAsync(nameof(EventSalary)).ConfigureAwait(false);
             var eventSalaryCollection = database.GetCollection<EventSalary>(nameof(EventSalary));
             var result = await eventSalaryCollection.Indexes.CreateOneAsync(

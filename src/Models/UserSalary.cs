@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ITLab.Salary.Models
 {
-    public class UserSalary : Salary
+    public class UserSalary : MetaSalary
     {
         public Guid UserId { get; set; }
         public DateTime Approved { get; set; }

@@ -6,9 +6,10 @@ using System.Text;
 
 namespace ITLab.Salary.Models
 {
-    public class RootSalary : MetaSalary
+    public class MetaSalary : Salary
     {
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
+        public DateTime Created { get; set; }
+        public DateTime ModificationDate { get; set; }
+        public Guid AuthorId { get; set; }
     }
 }

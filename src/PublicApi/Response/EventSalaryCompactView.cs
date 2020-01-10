@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ITLab.Salary.Models
+namespace ITLab.Salary.PublicApi.Response
 {
-    public class Salary
+    public class EventSalaryCompactView
     {
         public int Count { get; set; }
-        public string Description { get; set; }
+        public Guid EventId { get; set; }
     }
 }

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ITLab.Salary.Models
+namespace ITLab.Salary.PublicApi.Request.Salary
 {
-    public class Salary
+    public class SalaryInfo
     {
         public int Count { get; set; }
         public string Description { get; set; }
