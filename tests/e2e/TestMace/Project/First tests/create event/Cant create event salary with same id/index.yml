@@ -6,13 +6,17 @@ assignVariables: []
 requestData:
   request:
     method: POST
-    url: '${$env.basePath}/salary/v1/event/${newEventSalaryEventId}/${newShiftId}'
+    url: '${$env.basePath}/salary/v1/event/${newEventSalaryEventId}'
   headers: []
   disabledInheritedHeaders: []
   params: []
   body:
     type: Json
-    jsonBody: "{\r\n  \"count\": ${newShiftCount},\r\n  \"description\": \"${newShiftDescription}\"\r\n}"
+    jsonBody: |-
+      {
+        "count":${newEventSalaryCount},
+        "description":"${newEventSalaryDescription}"
+      }
     xmlBody: ''
     textBody: ''
     formData: []
@@ -21,4 +25,4 @@ requestData:
   strictSSL: Inherit
 authData:
   type: inherit
-name: Cant add new shift salary with same id
+name: Cant create event salary with same id

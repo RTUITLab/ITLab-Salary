@@ -66,14 +66,14 @@ namespace ITLab.Salary.Backend.Controllers
         /// <response code="404">Item not found</response>
         /// <returns></returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         [HttpGet("{eventId}", Name = "GetOneByEventID")]
         public async Task<ActionResult<EventSalaryFullView>> GetOne(Guid eventId)
         {
             var finded = await salaryContext.GetOneOrDefault(eventId).ConfigureAwait(false);
             if (finded == null)
             {
-                return NotFound();
+                return NotFound("NotFound event salary");
             }
             return mapper.Map<EventSalaryFullView>(finded);
         }
@@ -88,7 +88,7 @@ namespace ITLab.Salary.Backend.Controllers
         /// <response code="400">Event salary for thayt event exists</response>
         /// <returns></returns>
         [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ModelStateDictionary))]
         [HttpPost("{eventId}")]
         public async Task<ActionResult<EventSalaryFullView>> AddEventSalary(
             Guid eventId, 
@@ -120,7 +120,7 @@ namespace ITLab.Salary.Backend.Controllers
         /// <response code="404">Event salary not found</response>
         /// <returns></returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         [HttpPut("{eventId}")]
         public async Task<ActionResult<EventSalaryFullView>> UpdateEventSalaryInfo(
             Guid eventId,
@@ -130,12 +130,12 @@ namespace ITLab.Salary.Backend.Controllers
             {
                 var authorId = Guid.NewGuid();
                 var salary = mapper.Map<Models.Salary>(info);
-                await salaryContext.ChangeEventSalaryInfo(eventId, salary, authorId).ConfigureAwait(false);
-                return await GetOne(eventId).ConfigureAwait(false);
+                var updated = await salaryContext.UpdateEventSalaryInfo(eventId, salary, authorId).ConfigureAwait(false);
+                return mapper.Map<EventSalaryFullView>(updated);
             }
-            catch (NotFoundException)
+            catch (NotFoundException nfe)
             {
-                return NotFound();
+                return NotFound(nfe.Message);
             }
         }
 
@@ -147,24 +147,58 @@ namespace ITLab.Salary.Backend.Controllers
         /// <param name="shiftId">Target shift id</param>
         /// <param name="info">New Shift salary info</param>
         /// <response code="200">Returns the newly created item</response>
-        /// <response code="404">Event salary not found or shift id exists on that event</response>
+        /// <response code="400">Shift id exists on that event</response>
+        /// <response code="404">Event salary not found </response>
         /// <returns></returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        [HttpPut("{eventId}/{shiftId}")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
+        [HttpPost("{eventId}/{shiftId}")]
         public async Task<ActionResult<EventSalaryFullView>> AddShiftToEventSalary(Guid eventId, Guid shiftId, [FromBody] SalaryInfo info)
         {
             try
             {
                 var authorId = Guid.NewGuid();
                 var salary = mapper.Map<Models.Salary>(info);
-                await salaryContext.AddShiftToEventSalary(eventId, shiftId, salary, authorId).ConfigureAwait(false);
-                return await GetOne(eventId).ConfigureAwait(false);
+                var updated = await salaryContext.AddShiftToEventSalary(eventId, shiftId, salary, authorId).ConfigureAwait(false);
+                return mapper.Map<EventSalaryFullView>(updated);
             }
-            catch (NotFoundException)
+            catch (BadRequestException bre)
             {
-                return NotFound();
+                return BadRequest(bre.Message);
+            }
+            catch (NotFoundException nfe)
+            {
+                return NotFound(nfe.Message);
             }
         }
+
+        /// <summary>
+        /// Update shift salary info of event salary
+        /// </summary>
+        /// <param name="eventId">Target event id</param>
+        /// <param name="shiftId">Target shift id</param>
+        /// <param name="info">New Shift salary info</param>
+        /// <response code="200">Returns the updated item</response>
+        /// <response code="404">Event or shift salary not found</response>
+        /// <returns></returns>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
+        [HttpPut("{eventId}/{shiftId}")]
+        public async Task<ActionResult<EventSalaryFullView>> UpdateShiftSalaryInfo(Guid eventId, Guid shiftId, [FromBody] SalaryInfo info)
+        {
+            try
+            {
+                var authorId = Guid.NewGuid();
+                var salary = mapper.Map<Models.Salary>(info);
+                var updated = await salaryContext.UpdateShiftSalaryInfo(eventId, shiftId, salary, authorId).ConfigureAwait(false);
+                return mapper.Map<EventSalaryFullView>(updated);
+            }
+            catch (NotFoundException nfe)
+            {
+                return NotFound(nfe.Message);
+            }
+        }
+
     }
 }

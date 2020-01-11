@@ -5,14 +5,14 @@ type: RequestStep
 assignVariables: []
 requestData:
   request:
-    method: POST
-    url: '${$env.basePath}/salary/v1/event/${newEventSalaryEventId}/${newShiftId}'
+    method: GET
+    url: '${$env.basePath}/salary/v1/event/'
   headers: []
   disabledInheritedHeaders: []
   params: []
   body:
     type: Json
-    jsonBody: "{\r\n  \"count\": ${newShiftCount},\r\n  \"description\": \"${newShiftDescription}\"\r\n}"
+    jsonBody: ''
     xmlBody: ''
     textBody: ''
     formData: []
@@ -21,4 +21,4 @@ requestData:
   strictSSL: Inherit
 authData:
   type: inherit
-name: Cant add new shift salary with same id
+name: Start with empry event salary

@@ -1,0 +1,14 @@
+children:
+  - Edit event salary info
+  - Edit event salary info of incorrect event salary
+variables:
+  editEventSalaryCount: '2015'
+  editEventSalaryDescription: Edited event description
+type: Folder
+authData:
+  type: inherit
+requestData:
+  headers: []
+  disabledInheritedHeaders: []
+  strictSSL: Inherit
+name: edit event info

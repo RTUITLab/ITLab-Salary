@@ -3,7 +3,7 @@ children:
   - Create new salary event
   - Remember events count again
   - Test count changed
-  - Create new salary event Copy
+  - Cant create event salary with same id
 variables:
   newEventSalaryCount: '155'
   newEventSalaryDescription: Test descripton

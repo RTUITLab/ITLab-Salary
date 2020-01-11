@@ -5,7 +5,7 @@ type: RequestStep
 assignVariables: []
 requestData:
   request:
-    method: PUT
+    method: POST
     url: '${$env.basePath}/salary/v1/event/${newEventSalaryEventId}/${newShiftId}'
   headers: []
   disabledInheritedHeaders: []

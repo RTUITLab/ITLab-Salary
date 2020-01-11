@@ -6,5 +6,5 @@ assertions:
     type: compare
     actualValue: '${$response.code}'
     operator: equal
-    expectedValue: '400'
+    expectedValue: '404'
 name: Assertions
