@@ -1,0 +1,35 @@
+children: []
+variables: {}
+type: Assertion
+assertions:
+  - disabled: false
+    type: compare
+    actualValue: '${$response.body[''eventId'']}'
+    operator: equal
+    expectedValue: '${newEventSalaryEventId}'
+  - disabled: false
+    type: compare
+    actualValue: '${$response.body[''shiftSalaries''][0][''shiftId'']}'
+    operator: equal
+    expectedValue: '${newShiftId}'
+  - disabled: false
+    type: compare
+    actualValue: '${$response.code}'
+    operator: equal
+    expectedValue: '200'
+  - disabled: false
+    type: compare
+    actualValue: '${$response.body[''shiftSalaries''][0][''placeSalaries''][0][''count'']}'
+    operator: equal
+    expectedValue: '${newPlaceCount}'
+  - disabled: false
+    type: compare
+    actualValue: '${$response.body[''shiftSalaries''][0][''placeSalaries''][0][''description'']}'
+    operator: equal
+    expectedValue: '${newPlaceDescription}'
+  - disabled: false
+    type: compare
+    actualValue: '${$response.body[''shiftSalaries''][0][''placeSalaries''][0][''placeId'']}'
+    operator: equal
+    expectedValue: '${newPlaceId}'
+name: Assertions

@@ -141,7 +141,7 @@ namespace ITLab.Salary.Backend.Controllers
 
 
         /// <summary>
-        /// Add new shift to event salary
+        /// Add new shift salary to event salary
         /// </summary>
         /// <param name="eventId">Target event id</param>
         /// <param name="shiftId">Target shift id</param>
@@ -200,5 +200,38 @@ namespace ITLab.Salary.Backend.Controllers
             }
         }
 
+        /// <summary>
+        /// Add new place salary to shift salary
+        /// </summary>
+        /// <param name="eventId">Target event id</param>
+        /// <param name="shiftId">Target shift id</param>
+        /// <param name="placeId">Target place id</param>
+        /// <param name="info">New Place salary info</param>
+        /// <response code="200">Returns the newly created item</response>
+        /// <response code="400">Place id exists on that event</response>
+        /// <response code="404">Event or shift salary not found </response>
+        /// <returns></returns>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
+        [HttpPost("{eventId}/{shiftId}/{placeId}")]
+        public async Task<ActionResult<EventSalaryFullView>> AddShiftToEventSalary(Guid eventId, Guid shiftId, Guid placeId, [FromBody] SalaryInfo info)
+        {
+            try
+            {
+                var authorId = Guid.NewGuid();
+                var salary = mapper.Map<Models.Salary>(info);
+                var updated = await salaryContext.AddPlaceSalaryToShift(eventId, shiftId, placeId, salary, authorId).ConfigureAwait(false);
+                return mapper.Map<EventSalaryFullView>(updated);
+            }
+            catch (BadRequestException bre)
+            {
+                return BadRequest(bre.Message);
+            }
+            catch (NotFoundException nfe)
+            {
+                return NotFound(nfe.Message);
+            }
+        }
     }
 }

@@ -4,9 +4,11 @@ children:
   - edit event info
   - shift adding
   - shift editing
+  - place adding
 variables:
   newEventSalaryEventId: 431fcff2-bec2-452e-a68c-17bfcd087f65
   newShiftId: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+  newPlaceId: b881341f-7194-4aff-9275-593bd61b08d8
 type: Folder
 authData:
   type: inherit

@@ -7,7 +7,7 @@ requestData:
   request:
     method: PUT
     url: >-
-      ${$env.basePath}/salary/event/431fcff2-bec2-452e-a68c-17bfcd087f64/${newShiftId}
+      ${$env.basePath}/salary/v1/event/431fcff2-bec2-452e-a68c-17bfcd087f64/${newShiftId}
   headers: []
   disabledInheritedHeaders: []
   params: []

@@ -5,14 +5,15 @@ type: RequestStep
 assignVariables: []
 requestData:
   request:
-    method: PUT
-    url: '${$env.basePath}/salary/v1/event/${newEventSalaryEventId}/${newShiftId}'
+    method: POST
+    url: >-
+      ${$env.basePath}/salary/v1/event/3fa85f64-5717-4562-b3fc-2c963f66afb6/${newShiftId}/${newPlaceId}
   headers: []
   disabledInheritedHeaders: []
   params: []
   body:
     type: Json
-    jsonBody: "{\r\n  \"count\": ${editShiftCount},\r\n  \"description\": \"${editShiftDescription}\"\r\n}"
+    jsonBody: "{\r\n  \"count\": ${newPlaceCount},\r\n  \"description\": \"${newPlaceDescription}\"\r\n}"
     xmlBody: ''
     textBody: ''
     formData: []
@@ -21,4 +22,4 @@ requestData:
   strictSSL: Inherit
 authData:
   type: inherit
-name: Edit shift salary
+name: Cant add place salary to incorrect event id

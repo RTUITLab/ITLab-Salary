@@ -1,0 +1,15 @@
+children: []
+variables: {}
+type: Assertion
+assertions:
+  - disabled: false
+    type: compare
+    actualValue: '${$response.body[''shiftSalaries''][0][''placeSalaries''].length}'
+    operator: equal
+    expectedValue: '0'
+  - disabled: false
+    type: compare
+    actualValue: '${$response.code}'
+    operator: equal
+    expectedValue: '200'
+name: Assertions

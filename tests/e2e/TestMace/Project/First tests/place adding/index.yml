@@ -1,0 +1,17 @@
+children:
+  - Check is no places in event salary
+  - Add new place to shift salary
+  - Cant add place salary with same id
+  - Cant add place salary to incorrect shift id
+  - Cant add place salary to incorrect event id
+variables:
+  newPlaceCount: '409'
+  newPlaceDescription: new place description
+type: Folder
+authData:
+  type: inherit
+requestData:
+  headers: []
+  disabledInheritedHeaders: []
+  strictSSL: Inherit
+name: place adding
