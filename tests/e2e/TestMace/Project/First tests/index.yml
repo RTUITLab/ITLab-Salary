@@ -1,6 +1,7 @@
 children:
   - Start with empry event salary
   - create event
+  - edit event info
   - shift adding
   - shift editing
 variables:

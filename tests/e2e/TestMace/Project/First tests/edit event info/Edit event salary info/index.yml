@@ -1,0 +1,28 @@
+children:
+  - Assertions
+variables: {}
+type: RequestStep
+assignVariables: []
+requestData:
+  request:
+    method: PUT
+    url: '${$env.basePath}/salary/event/${newEventSalaryEventId}'
+  headers: []
+  disabledInheritedHeaders: []
+  params: []
+  body:
+    type: Json
+    jsonBody: |-
+      {
+        "count":${editEventSalaryCount},
+        "description":"${editEventSalaryDescription}"
+      }
+    xmlBody: ''
+    textBody: ''
+    formData: []
+    file: ''
+    formURLEncoded: []
+  strictSSL: Inherit
+authData:
+  type: inherit
+name: Edit event salary info

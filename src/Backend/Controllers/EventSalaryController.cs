@@ -122,8 +122,8 @@ namespace ITLab.Salary.Backend.Controllers
             {
                 var authorId = Guid.NewGuid();
                 var salary = mapper.Map<Models.Salary>(info);
-                await salaryContext.UpdateEventSalaryInfo(eventId, salary, authorId).ConfigureAwait(false);
-                return await GetOne(eventId).ConfigureAwait(false);
+                var updated = await salaryContext.UpdateEventSalaryInfo(eventId, salary, authorId).ConfigureAwait(false);
+                return mapper.Map<EventSalaryFullView>(updated);
             }
             catch (NotFoundException nfe)
             {
@@ -152,8 +152,8 @@ namespace ITLab.Salary.Backend.Controllers
             {
                 var authorId = Guid.NewGuid();
                 var salary = mapper.Map<Models.Salary>(info);
-                await salaryContext.AddShiftToEventSalary(eventId, shiftId, salary, authorId).ConfigureAwait(false);
-                return await GetOne(eventId).ConfigureAwait(false);
+                var updated = await salaryContext.AddShiftToEventSalary(eventId, shiftId, salary, authorId).ConfigureAwait(false);
+                return mapper.Map<EventSalaryFullView>(updated);
             }
             catch (BadRequestException bre)
             {
@@ -183,8 +183,8 @@ namespace ITLab.Salary.Backend.Controllers
             {
                 var authorId = Guid.NewGuid();
                 var salary = mapper.Map<Models.Salary>(info);
-                await salaryContext.UpdateShiftSalaryInfo(eventId, shiftId, salary, authorId).ConfigureAwait(false);
-                return await GetOne(eventId).ConfigureAwait(false);
+                var updated = await salaryContext.UpdateShiftSalaryInfo(eventId, shiftId, salary, authorId).ConfigureAwait(false);
+                return mapper.Map<EventSalaryFullView>(updated);
             }
             catch (NotFoundException nfe)
             {
