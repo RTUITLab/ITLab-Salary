@@ -14,4 +14,9 @@ assertions:
       const requestNode = tm.currentNode.parent;
       assert(Array.isArray(requestNode.response.body), 'body must be aarray')
     name: body is array
+  - disabled: false
+    type: compare
+    actualValue: '${$response.body.length}'
+    operator: equal
+    expectedValue: '0'
 name: Assertions

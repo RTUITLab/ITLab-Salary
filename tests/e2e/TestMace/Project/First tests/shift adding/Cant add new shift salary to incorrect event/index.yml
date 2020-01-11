@@ -6,7 +6,8 @@ assignVariables: []
 requestData:
   request:
     method: POST
-    url: '${$env.basePath}/salary/event/${newEventSalaryEventId}/${newShiftId}'
+    url: >-
+      ${$env.basePath}/salary/event/431fcff2-bec2-452e-a68c-17bfcd087f66/${newShiftId}
   headers: []
   disabledInheritedHeaders: []
   params: []
@@ -21,4 +22,4 @@ requestData:
   strictSSL: Inherit
 authData:
   type: inherit
-name: Add new shift to event salary
+name: Cant add new shift salary to incorrect event

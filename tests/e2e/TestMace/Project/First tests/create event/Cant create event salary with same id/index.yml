@@ -1,4 +1,4 @@
-children: 
+children:
   - Assertions
 variables: {}
 type: RequestStep
@@ -25,4 +25,4 @@ requestData:
   strictSSL: Inherit
 authData:
   type: inherit
-name: Create new salary event Copy
+name: Cant create event salary with same id
