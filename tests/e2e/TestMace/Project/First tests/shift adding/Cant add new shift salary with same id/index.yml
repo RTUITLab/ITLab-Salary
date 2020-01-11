@@ -6,7 +6,7 @@ assignVariables: []
 requestData:
   request:
     method: PUT
-    url: '${$env.basePath}/salary/event/${newEventSalaryEventId}/${newShiftId}'
+    url: '${$env.basePath}/salary/v1/event/${newEventSalaryEventId}/${newShiftId}'
   headers: []
   disabledInheritedHeaders: []
   params: []

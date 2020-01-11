@@ -20,8 +20,9 @@ namespace ITLab.Salary.Backend.Controllers
     /// <summary>
     /// Manage event salary
     /// </summary>
+    [ApiVersion("1.0")]
     [Produces("application/json")]
-    [Route("salary/event")]
+    [Route("salary/v{version:apiVersion}/event")]
     [ApiController]
     public class EventSalaryController : ControllerBase
     {
@@ -66,7 +67,7 @@ namespace ITLab.Salary.Backend.Controllers
         /// <returns></returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [HttpGet("{eventId}")]
+        [HttpGet("{eventId}", Name = "GetOneByEventID")]
         public async Task<ActionResult<EventSalaryFullView>> GetOne(Guid eventId)
         {
             var finded = await salaryContext.GetOneOrDefault(eventId).ConfigureAwait(false);
@@ -81,6 +82,7 @@ namespace ITLab.Salary.Backend.Controllers
         /// Add new event salary record
         /// </summary>
         /// <param name="eventId">Target event id</param>
+        /// <param name="apiVersion"></param>
         /// <param name="createRequest">Info about event salary</param>
         /// <response code="201">Returns the newly created item</response>
         /// <response code="400">Event salary for thayt event exists</response>
@@ -88,14 +90,18 @@ namespace ITLab.Salary.Backend.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost("{eventId}")]
-        public async Task<ActionResult<EventSalaryFullView>> AddEventSalary(Guid eventId, [FromBody] EventSalaryCreate createRequest)
+        public async Task<ActionResult<EventSalaryFullView>> AddEventSalary(
+            Guid eventId, 
+            ApiVersion apiVersion,
+            [FromBody] EventSalaryCreate createRequest)
         {
+            apiVersion = apiVersion ?? throw new ArgumentNullException(nameof(apiVersion));
             try
             {
                 var authorId = Guid.NewGuid();
                 var es = mapper.Map<EventSalary>(createRequest);
                 await salaryContext.AddNewEventSalary(eventId, es, authorId).ConfigureAwait(false);
-                return CreatedAtAction(nameof(GetOne), new { eventId = es.EventId }, mapper.Map<EventSalaryFullView>(es));
+                return CreatedAtRoute("GetOneByEventID",  new { eventId = es.EventId, version = apiVersion.ToString() }, mapper.Map<EventSalaryFullView>(es));
             }
             catch (MongoWriteException ex) when
                   (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
@@ -116,7 +122,9 @@ namespace ITLab.Salary.Backend.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         [HttpPut("{eventId}")]
-        public async Task<ActionResult<EventSalaryFullView>> UpdateEventSalaryInfo(Guid eventId, [FromBody] SalaryInfo info)
+        public async Task<ActionResult<EventSalaryFullView>> UpdateEventSalaryInfo(
+            Guid eventId,
+            [FromBody] SalaryInfo info)
         {
             try
             {

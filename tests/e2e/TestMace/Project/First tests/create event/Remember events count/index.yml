@@ -11,7 +11,7 @@ assignVariables:
 requestData:
   request:
     method: GET
-    url: '${$env.basePath}/salary/event/'
+    url: '${$env.basePath}/salary/v1/event/'
   headers: []
   disabledInheritedHeaders: []
   params: []
