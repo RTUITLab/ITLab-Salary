@@ -16,4 +16,4 @@ requestData:
   headers: []
   disabledInheritedHeaders: []
   strictSSL: Inherit
-name: First tests
+name: v1.0

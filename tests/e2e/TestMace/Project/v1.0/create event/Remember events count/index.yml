@@ -5,7 +5,7 @@ type: RequestStep
 assignVariables:
   - assign:
       type: reference
-      refNodePath: Project/First tests/create event
+      refNodePath: Project/v1.0/create event
     path: body.length
     variable: salaryCount
 requestData:

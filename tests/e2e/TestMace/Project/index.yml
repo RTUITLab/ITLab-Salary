@@ -8,7 +8,7 @@ environments:
     e2e:
       basePath: 'http://test-salary-api:8080'
 children:
-  - First tests
+  - v1.0
 variables: {}
 authData:
   type: inherit
