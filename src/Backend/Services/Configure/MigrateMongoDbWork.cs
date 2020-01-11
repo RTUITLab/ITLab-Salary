@@ -19,19 +19,21 @@ namespace ITLab.Salary.Backend.Services.Configure
     public class MigrateMongoDbWork : IConfigureWork
     {
         private readonly ILogger<MigrateMongoDbWork> logger;
-        private readonly SalaryContext salaryContext;
+        private readonly IMongoDatabase database;
 
         /// <summary>
         /// Default constructor
         /// </summary>
         /// <param name="logger">Logger for provide logs</param>
-        /// <param name="salaryContext">Database context</param>
+        /// <param name="dbFactory">Database context</param>
         public MigrateMongoDbWork(
             ILogger<MigrateMongoDbWork> logger,
-            SalaryContext salaryContext)
+            IDbFactory dbFactory)
         {
+            dbFactory = dbFactory ?? throw new ArgumentNullException(nameof(dbFactory));
+
             this.logger = logger;
-            this.salaryContext = salaryContext;
+            this.database = dbFactory.GetDatabase<MigrateMongoDbWork>();
         }
 
         /// <summary>
@@ -41,7 +43,7 @@ namespace ITLab.Salary.Backend.Services.Configure
         /// <returns></returns>
         public async Task Configure(CancellationToken cancellationToken)
         {
-            var appliedMigrations = await GetAppliedMigrations(salaryContext.Database).ConfigureAwait(false);
+            var appliedMigrations = await GetAppliedMigrations(database).ConfigureAwait(false);
             logger.LogInformation($"Already applied {appliedMigrations.Count} migrations");
             var migrations = Assembly
                 .GetExecutingAssembly()
@@ -57,8 +59,8 @@ namespace ITLab.Salary.Backend.Services.Configure
             foreach (var migration in migrations)
             {
                 logger.LogInformation($"apply migration {migration.Name}");
-                await migration.DoChanges(salaryContext.Database).ConfigureAwait(false);
-                await SaveMigrationRecord(salaryContext.Database, migration).ConfigureAwait(false);
+                await migration.DoChanges(database).ConfigureAwait(false);
+                await SaveMigrationRecord(database, migration).ConfigureAwait(false);
             }
         }
 

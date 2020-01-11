@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using AutoMapper;
 using ITLab.Salary.Backend.Formatting;
+using ITLab.Salary.Backend.Services;
 using ITLab.Salary.Backend.Services.Configure;
 using ITLab.Salary.Backend.Swagger;
 using ITLab.Salary.Database;
@@ -41,12 +42,8 @@ namespace ITLab.Salary.Backend
         {
             services.AddControllers();
 
-            services.AddSingleton(s => new SalaryContext(
-                s.GetRequiredService<IConfiguration>().GetConnectionString("MongoDb"),
-                s.GetRequiredService<ILogger<SalaryContext>>()
-                )
-            );
-
+            services.AddSingleton<IDbFactory, ConcurrentDictionaryDbFactory>();
+            services.AddTransient<EventSalaryContext>();
 
             services.AddAutoMapper(typeof(Requests));
 
@@ -88,8 +85,6 @@ namespace ITLab.Salary.Backend
             {
                 app.UseDeveloperExceptionPage();
             }
-
-            
 
             app.UseRouting();
 

@@ -7,11 +7,11 @@ using System.Text;
 
 namespace ITLab.Salary.Database
 {
-    public class EventSalaryHistoryRecord
+    public class HistoryRecord<T>
     {
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
         public DateTime SavedDate { get; set; }
-        public EventSalary EventSalary { get; set; }
+        public T Object { get; set; }
     }
 }
