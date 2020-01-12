@@ -7,6 +7,5 @@ namespace ITLab.Salary.PublicApi.Request.Salary
     public class ShiftSalaryCreate : SalaryInfo
     {
         public Guid ShiftId { get; set; }
-        public List<PlaceSalaryCreate> PlaceSalaries { get; set; }
     }
 }

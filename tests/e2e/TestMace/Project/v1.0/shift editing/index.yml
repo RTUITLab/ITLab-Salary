@@ -5,7 +5,7 @@ children:
   - Edit shift salary on incorrect shift id
 variables:
   editShiftCount: '200'
-  editShiftDescription: Edited shidt description
+  editShiftDescription: Edited shift description
 type: Folder
 authData:
   type: inherit

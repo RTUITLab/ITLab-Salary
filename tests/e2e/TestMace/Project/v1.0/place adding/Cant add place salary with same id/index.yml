@@ -7,7 +7,7 @@ requestData:
   request:
     method: POST
     url: >-
-      ${$env.basePath}/salary/v1/event/${newEventSalaryEventId}/${newShiftId}/${newPlaceId}
+      ${$env.basePath}/salary/v1/event/${newEventSalaryEventId}/place/${newPlaceId}
   headers: []
   disabledInheritedHeaders: []
   params: []

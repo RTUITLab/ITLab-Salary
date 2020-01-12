@@ -1,0 +1,16 @@
+children:
+  - Check is target place exists
+  - Edit place salary
+  - Edit place salary on incorrect event id
+  - Edit shift salary on incorrect place id
+variables:
+  editPlaceCount: '2000'
+  editPlaceDescription: Edited place description
+type: Folder
+authData:
+  type: inherit
+requestData:
+  headers: []
+  disabledInheritedHeaders: []
+  strictSSL: Inherit
+name: place editing

@@ -5,15 +5,14 @@ type: RequestStep
 assignVariables: []
 requestData:
   request:
-    method: PUT
-    url: >-
-      ${$env.basePath}/salary/v1/event/431fcff2-bec2-452e-a68c-17bfcd087f64/shift/${newShiftId}
+    method: GET
+    url: '${$env.basePath}/salary/v1/event/${newEventSalaryEventId}'
   headers: []
   disabledInheritedHeaders: []
   params: []
   body:
     type: Json
-    jsonBody: "{\r\n  \"count\": ${editShiftCount},\r\n  \"description\": \"${editShiftDescription}\"\r\n}"
+    jsonBody: ''
     xmlBody: ''
     textBody: ''
     formData: []
@@ -22,4 +21,4 @@ requestData:
   strictSSL: Inherit
 authData:
   type: inherit
-name: Edit shift salary on incorrect event id
+name: Check is target place exists

@@ -7,13 +7,13 @@ requestData:
   request:
     method: PUT
     url: >-
-      ${$env.basePath}/salary/v1/event/431fcff2-bec2-452e-a68c-17bfcd087f64/shift/${newShiftId}
+      ${$env.basePath}/salary/v1/event/${newEventSalaryEventId}/place/431fcff2-bec2-452e-a68c-17bfcd087f66
   headers: []
   disabledInheritedHeaders: []
   params: []
   body:
     type: Json
-    jsonBody: "{\r\n  \"count\": ${editShiftCount},\r\n  \"description\": \"${editShiftDescription}\"\r\n}"
+    jsonBody: "{\r\n  \"count\": ${editPlaceCount},\r\n  \"description\": \"${editPlaceDescription}\"\r\n}"
     xmlBody: ''
     textBody: ''
     formData: []
@@ -22,4 +22,4 @@ requestData:
   strictSSL: Inherit
 authData:
   type: inherit
-name: Edit shift salary on incorrect event id
+name: Edit shift salary on incorrect place id

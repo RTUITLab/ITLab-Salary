@@ -7,6 +7,5 @@ namespace ITLab.Salary.PublicApi.Response
     public class ShiftSalaryView : SalaryView
     {
         public Guid ShiftId { get; set; }
-        public List<PlaceSalaryView> PlaceSalaries { get; set; }
     }
 }

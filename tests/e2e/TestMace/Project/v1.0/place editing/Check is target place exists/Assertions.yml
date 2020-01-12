@@ -4,12 +4,12 @@ type: Assertion
 assertions:
   - disabled: false
     type: compare
-    actualValue: '${$response.body[''placeSalaries''].length}'
-    operator: equal
-    expectedValue: '0'
-  - disabled: false
-    type: compare
     actualValue: '${$response.code}'
     operator: equal
     expectedValue: '200'
+  - disabled: false
+    type: compare
+    actualValue: '${$response.body[''placeSalaries''][0][''placeId'']}'
+    operator: equal
+    expectedValue: '${newPlaceId}'
 name: Assertions

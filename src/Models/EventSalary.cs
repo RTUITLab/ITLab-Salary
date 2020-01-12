@@ -8,5 +8,8 @@ namespace ITLab.Salary.Models
     {
         public Guid EventId { get; set; }
         public List<ShiftSalary> ShiftSalaries { get; set; }
+        public List<PlaceSalary> PlaceSalaries { get; set; }
+        //public List<UserSalary> UserSalaries { get; set; }
+
     }
 }

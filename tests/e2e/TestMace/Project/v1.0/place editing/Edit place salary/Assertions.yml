@@ -9,22 +9,22 @@ assertions:
     expectedValue: '${newEventSalaryEventId}'
   - disabled: false
     type: compare
-    actualValue: '${$response.code}'
+    actualValue: '${$response.body[''placeSalaries''][0][''placeId'']}'
     operator: equal
-    expectedValue: '200'
+    expectedValue: '${newPlaceId}'
   - disabled: false
     type: compare
     actualValue: '${$response.body[''placeSalaries''][0][''count'']}'
     operator: equal
-    expectedValue: '${newPlaceCount}'
+    expectedValue: '${editPlaceCount}'
   - disabled: false
     type: compare
     actualValue: '${$response.body[''placeSalaries''][0][''description'']}'
     operator: equal
-    expectedValue: '${newPlaceDescription}'
+    expectedValue: '${editPlaceDescription}'
   - disabled: false
     type: compare
-    actualValue: '${$response.body[''placeSalaries''][0][''placeId'']}'
+    actualValue: '${$response.code}'
     operator: equal
-    expectedValue: '${newPlaceId}'
+    expectedValue: '200'
 name: Assertions

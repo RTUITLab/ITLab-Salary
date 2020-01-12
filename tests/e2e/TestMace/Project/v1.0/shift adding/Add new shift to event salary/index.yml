@@ -6,7 +6,8 @@ assignVariables: []
 requestData:
   request:
     method: POST
-    url: '${$env.basePath}/salary/v1/event/${newEventSalaryEventId}/${newShiftId}'
+    url: >-
+      ${$env.basePath}/salary/v1/event/${newEventSalaryEventId}/shift/${newShiftId}
   headers: []
   disabledInheritedHeaders: []
   params: []

@@ -88,7 +88,7 @@ namespace ITLab.Salary.Backend.Controllers
         /// <response code="400">Event salary for thayt event exists</response>
         /// <returns></returns>
         [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ModelStateDictionary))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(Dictionary<string, string>))]
         [HttpPost("{eventId}")]
         public async Task<ActionResult<EventSalaryFullView>> AddEventSalary(
             Guid eventId, 
@@ -98,6 +98,7 @@ namespace ITLab.Salary.Backend.Controllers
             apiVersion = apiVersion ?? throw new ArgumentNullException(nameof(apiVersion));
             try
             {
+                logger.LogWarning("using mock author");
                 var authorId = Guid.NewGuid();
                 var es = mapper.Map<EventSalary>(createRequest);
                 await eventSalaryContext.AddNew(eventId, es, authorId).ConfigureAwait(false);
@@ -106,8 +107,10 @@ namespace ITLab.Salary.Backend.Controllers
             catch (MongoWriteException ex) when
                   (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
             {
-                var msd = new ModelStateDictionary();
-                msd.AddModelError("eventId", "Salary for that event exists");
+                var msd = new Dictionary<string, string>
+                {
+                    ["eventId"] = "Salary for that event exists"
+                };
                 return BadRequest(msd);
             }
         }
@@ -128,6 +131,7 @@ namespace ITLab.Salary.Backend.Controllers
         {
             try
             {
+                logger.LogWarning("using mock author");
                 var authorId = Guid.NewGuid();
                 var salary = mapper.Map<Models.Salary>(info);
                 var updated = await eventSalaryContext.UpdateEvenInfo(eventId, salary, authorId).ConfigureAwait(false);
@@ -153,11 +157,12 @@ namespace ITLab.Salary.Backend.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
-        [HttpPost("{eventId}/{shiftId}")]
+        [HttpPost("{eventId}/shift/{shiftId}")]
         public async Task<ActionResult<EventSalaryFullView>> AddShiftToEventSalary(Guid eventId, Guid shiftId, [FromBody] SalaryInfo info)
         {
             try
             {
+                logger.LogWarning("using mock author");
                 var authorId = Guid.NewGuid();
                 var salary = mapper.Map<Models.Salary>(info);
                 var updated = await eventSalaryContext.AddShift(eventId, shiftId, salary, authorId).ConfigureAwait(false);
@@ -184,11 +189,12 @@ namespace ITLab.Salary.Backend.Controllers
         /// <returns></returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
-        [HttpPut("{eventId}/{shiftId}")]
+        [HttpPut("{eventId}/shift/{shiftId}")]
         public async Task<ActionResult<EventSalaryFullView>> UpdateShiftSalaryInfo(Guid eventId, Guid shiftId, [FromBody] SalaryInfo info)
         {
             try
             {
+                logger.LogWarning("using mock author");
                 var authorId = Guid.NewGuid();
                 var salary = mapper.Map<Models.Salary>(info);
                 var updated = await eventSalaryContext.UpdateShiftInfo(eventId, shiftId, salary, authorId).ConfigureAwait(false);
@@ -201,32 +207,63 @@ namespace ITLab.Salary.Backend.Controllers
         }
 
         /// <summary>
-        /// Add new place salary to shift salary
+        /// Add new place salary to event salary
         /// </summary>
         /// <param name="eventId">Target event id</param>
-        /// <param name="shiftId">Target shift id</param>
         /// <param name="placeId">Target place id</param>
         /// <param name="info">New Place salary info</param>
         /// <response code="200">Returns the newly created item</response>
         /// <response code="400">Place id exists on that event</response>
-        /// <response code="404">Event or shift salary not found </response>
+        /// <response code="404">Event salary not found </response>
         /// <returns></returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
-        [HttpPost("{eventId}/{shiftId}/{placeId}")]
-        public async Task<ActionResult<EventSalaryFullView>> AddShiftToEventSalary(Guid eventId, Guid shiftId, Guid placeId, [FromBody] SalaryInfo info)
+        [HttpPost("{eventId}/place/{placeId}")]
+        public async Task<ActionResult<EventSalaryFullView>> AddPlaceToEventSalary(Guid eventId, Guid placeId, [FromBody] SalaryInfo info)
         {
             try
             {
+                logger.LogWarning("using mock author");
                 var authorId = Guid.NewGuid();
                 var salary = mapper.Map<Models.Salary>(info);
-                var updated = await eventSalaryContext.AddPlace(eventId, shiftId, placeId, salary, authorId).ConfigureAwait(false);
+                var updated = await eventSalaryContext.AddPlace(eventId, placeId, salary, authorId).ConfigureAwait(false);
                 return mapper.Map<EventSalaryFullView>(updated);
             }
             catch (BadRequestException bre)
             {
                 return BadRequest(bre.Message);
+            }
+            catch (NotFoundException nfe)
+            {
+                return NotFound(nfe.Message);
+            }
+        }
+
+        /// <summary>
+        /// Update place salary info of event salary
+        /// </summary>
+        /// <param name="eventId">Target event id</param>
+        /// <param name="placeId">Target place id</param>
+        /// <param name="info">New Shift salary info</param>
+        /// <response code="200">Returns the updated item</response>
+        /// <response code="404">Event salary not found</response>
+        /// <returns></returns>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
+        [HttpPut("{eventId}/place/{placeId}")]
+        public async Task<ActionResult<EventSalaryFullView>> UpdatPlaceSalaryInfo(
+            Guid eventId, 
+            Guid placeId,
+            [FromBody] SalaryInfo info)
+        {
+            try
+            {
+                logger.LogWarning("using mock author");
+                var authorId = Guid.NewGuid();
+                var salary = mapper.Map<Models.Salary>(info);
+                var updated = await eventSalaryContext.UpdatePlaceInfo(eventId, placeId, salary, authorId).ConfigureAwait(false);
+                return mapper.Map<EventSalaryFullView>(updated);
             }
             catch (NotFoundException nfe)
             {
