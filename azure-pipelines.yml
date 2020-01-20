@@ -1,0 +1,91 @@
+trigger:
+  - master
+  - develop
+
+name: $(BuildID)-$(Build.SourceBranchName)
+
+
+jobs:
+- job: build
+  pool:
+    vmImage: ubuntu-latest
+  steps:
+  - checkout: self
+    clean: true
+    fetchDepth: 1
+
+  - task: DotNetCoreCLI@2
+    displayName: dotnet restore
+    inputs:
+      command: restore
+      arguments: --source https://api.nuget.org/v3/index.json
+
+  - task: DotNetCoreCLI@2
+    displayName: dotnet publish
+    inputs:
+      command: publish
+      publishWebProjects: false
+      projects: src/Backend/Backend.csproj
+      arguments: -o $(Build.ArtifactStagingDirectory) -c Release --no-restore
+      zipAfterPublish: false
+      modifyOutputPath: false
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact: itlab-salary-build'
+    inputs:
+      ArtifactName: 'itlab-salary-build'
+
+  - task: CopyFiles@2
+    displayName: 'copy deploy artifact'
+    inputs:
+      SourceFolder: 'deploy'
+      Contents: '**'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+      CleanTargetFolder: true
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact: itlab-salary-deploy'
+    inputs:
+      ArtifactName: 'itlab-salary-deploy'
+
+- job: test
+
+  pool:
+    vmImage: ubuntu-latest
+
+  steps:
+  - task: CmdLine@2
+    displayName: run web app
+    inputs:
+      script: |
+        docker-compose --no-ansi build
+        docker-compose --no-ansi up -d web-app
+      workingDirectory: './tests/e2e'
+
+  - task: CmdLine@2
+    displayName: run testmace
+    inputs:
+      script: |
+        docker-compose --no-ansi up testmace
+      workingDirectory: './tests/docker'
+
+  - task: CmdLine@2
+    displayName: show logs
+    inputs:
+      script: |
+        docker-compose logs web-app
+      workingDirectory: './tests/docker'
+
+  - task: CmdLine@2
+    displayName: remove all
+    inputs:
+      script: |
+        docker-compose --no-ansi rm -f -s
+      workingDirectory: './tests/docker'
+
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: 'testmace*.xml'
+      searchFolder: 'tests/docker/out'
+      failTaskOnFailedTests: true

@@ -1,15 +1,14 @@
 version: "3.7"
 
 services:
-  test-salary-api:
-    build: ./api
-    depends_on:
-    - test-db
 
-  test-db:
-    image: postgres:alpine,
-    environment:
-      - POSTGRES_PASSWORD=password
+  mongo-db:
+    image: mongo
+
+  test-salary-api:
+    build: ./salary-api
+    depends_on:
+    - mongo-db
 
   testmace:
     build: ./TestMace

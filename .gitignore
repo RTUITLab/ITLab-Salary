@@ -338,3 +338,6 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+tests/e2e/out/
+
+tests/e2e/salary-api/itlab-salary-build/

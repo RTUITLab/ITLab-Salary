@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
+#pragma warning disable CA1031 // Do not catch general exception types
 namespace ITLab.Salary.Backend.Services.Configure
 {
     /// <summary>
@@ -42,6 +43,23 @@ namespace ITLab.Salary.Backend.Services.Configure
         /// <param name="cancellationToken">Not uses</param>
         /// <returns></returns>
         public async Task Configure(CancellationToken cancellationToken)
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                try
+                {
+                    logger.LogInformation($"Applying migrations try {i}");
+                    await TryApplyMigrations().ConfigureAwait(false);
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    logger.LogWarning(ex, $"Can't apply migrations on try {i}");
+                }
+            }
+        }
+
+        private async Task TryApplyMigrations()
         {
             var appliedMigrations = await GetAppliedMigrations(database).ConfigureAwait(false);
             logger.LogInformation($"Already applied {appliedMigrations.Count} migrations");
@@ -83,3 +101,4 @@ namespace ITLab.Salary.Backend.Services.Configure
         }
     }
 }
+#pragma warning restore CA1031 // Do not catch general exception types
