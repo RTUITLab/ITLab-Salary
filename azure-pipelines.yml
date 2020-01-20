@@ -62,38 +62,36 @@ stages:
       vmImage: ubuntu-latest
 
     steps:
-    - task: CmdLine@2
-      displayName: run web app
-      inputs:
-        script: |
-          docker-compose --no-ansi build
-          docker-compose --no-ansi up -d web-app
-        workingDirectory: './tests/e2e'
 
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        buildType: 'current'
+        artifactName: 'itlab-salary-build'
+        targetPath: './tests/e2e/salary-api/itlab-salary-build'
     - task: CmdLine@2
       displayName: run testmace
       inputs:
         script: |
           docker-compose --no-ansi up testmace
-        workingDirectory: './tests/docker'
+        workingDirectory: './tests/e2e'
 
     - task: CmdLine@2
       displayName: show logs
       inputs:
         script: |
-          docker-compose logs web-app
-        workingDirectory: './tests/docker'
+          docker-compose logs test-salary-api
+        workingDirectory: './tests/e2e'
 
     - task: CmdLine@2
-      displayName: remove all
+      displayName: remove all cintainers
       inputs:
         script: |
           docker-compose --no-ansi rm -f -s
-        workingDirectory: './tests/docker'
+        workingDirectory: './tests/e2e'
 
     - task: PublishTestResults@2
       inputs:
         testResultsFormat: 'JUnit'
         testResultsFiles: 'testmace*.xml'
-        searchFolder: 'tests/docker/out'
+        searchFolder: 'tests/e2e/out'
         failTaskOnFailedTests: true
