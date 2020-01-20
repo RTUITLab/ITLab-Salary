@@ -2,7 +2,7 @@ children: []
 variables: {}
 type: Script
 name: Test count changed
-script: |-
+script: |
 
   assert.equal(tm.currentNode.dynamicVars.salaryCount2
              - tm.currentNode.dynamicVars.salaryCount,

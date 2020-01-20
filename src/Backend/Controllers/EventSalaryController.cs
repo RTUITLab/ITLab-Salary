@@ -150,7 +150,7 @@ namespace ITLab.Salary.Backend.Controllers
         /// <param name="eventId">Target event id</param>
         /// <param name="shiftId">Target shift id</param>
         /// <param name="info">New Shift salary info</param>
-        /// <response code="200">Returns the newly created item</response>
+        /// <response code="200">Returns the updated item</response>
         /// <response code="400">Shift id exists on that event</response>
         /// <response code="404">Event salary not found </response>
         /// <returns></returns>

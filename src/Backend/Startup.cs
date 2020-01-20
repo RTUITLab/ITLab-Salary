@@ -22,6 +22,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.PlatformAbstractions;
 using Microsoft.OpenApi.Models;
 using RTUITLab.AspNetCore.Configure.Configure;
+using RTUITLab.AspNetCore.Configure.Invokations;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace ITLab.Salary.Backend
@@ -85,6 +86,8 @@ namespace ITLab.Salary.Backend
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseWebAppConfigure();
 
             app.UseRouting();
 
