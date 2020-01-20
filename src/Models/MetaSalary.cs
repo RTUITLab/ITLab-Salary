@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ITLab.Salary.Models
 {
-    public class MetaSalary : Salary
+    public class MetaSalary : SalaryModel
     {
         public DateTime Created { get; set; }
         public DateTime ModificationDate { get; set; }

@@ -23,8 +23,7 @@ namespace ITLab.Salary.Backend.Controllers
     [ApiVersion("1.0")]
     [Produces("application/json")]
     [Route("salary/v{version:apiVersion}/event")]
-    [ApiController]
-    public class EventSalaryController : ControllerBase
+    public class EventSalaryController : AuthorizedController
     {
         private readonly EventSalaryContext eventSalaryContext;
         private readonly IMapper mapper;
@@ -98,10 +97,8 @@ namespace ITLab.Salary.Backend.Controllers
             apiVersion = apiVersion ?? throw new ArgumentNullException(nameof(apiVersion));
             try
             {
-                logger.LogWarning("using mock author");
-                var authorId = Guid.NewGuid();
                 var es = mapper.Map<EventSalary>(createRequest);
-                await eventSalaryContext.AddNew(eventId, es, authorId).ConfigureAwait(false);
+                await eventSalaryContext.AddNew(eventId, es, UserId).ConfigureAwait(false);
                 return CreatedAtRoute("GetOneByEventID",  new { eventId = es.EventId, version = apiVersion.ToString() }, mapper.Map<EventSalaryFullView>(es));
             }
             catch (MongoWriteException ex) when
@@ -133,7 +130,7 @@ namespace ITLab.Salary.Backend.Controllers
             {
                 logger.LogWarning("using mock author");
                 var authorId = Guid.NewGuid();
-                var salary = mapper.Map<Models.Salary>(info);
+                var salary = mapper.Map<SalaryModel>(info);
                 var updated = await eventSalaryContext.UpdateEvenInfo(eventId, salary, authorId).ConfigureAwait(false);
                 return mapper.Map<EventSalaryFullView>(updated);
             }
@@ -164,7 +161,7 @@ namespace ITLab.Salary.Backend.Controllers
             {
                 logger.LogWarning("using mock author");
                 var authorId = Guid.NewGuid();
-                var salary = mapper.Map<Models.Salary>(info);
+                var salary = mapper.Map<SalaryModel>(info);
                 var updated = await eventSalaryContext.AddShift(eventId, shiftId, salary, authorId).ConfigureAwait(false);
                 return mapper.Map<EventSalaryFullView>(updated);
             }
@@ -196,7 +193,7 @@ namespace ITLab.Salary.Backend.Controllers
             {
                 logger.LogWarning("using mock author");
                 var authorId = Guid.NewGuid();
-                var salary = mapper.Map<Models.Salary>(info);
+                var salary = mapper.Map<SalaryModel>(info);
                 var updated = await eventSalaryContext.UpdateShiftInfo(eventId, shiftId, salary, authorId).ConfigureAwait(false);
                 return mapper.Map<EventSalaryFullView>(updated);
             }
@@ -226,7 +223,7 @@ namespace ITLab.Salary.Backend.Controllers
             {
                 logger.LogWarning("using mock author");
                 var authorId = Guid.NewGuid();
-                var salary = mapper.Map<Models.Salary>(info);
+                var salary = mapper.Map<SalaryModel>(info);
                 var updated = await eventSalaryContext.AddPlace(eventId, placeId, salary, authorId).ConfigureAwait(false);
                 return mapper.Map<EventSalaryFullView>(updated);
             }
@@ -261,7 +258,7 @@ namespace ITLab.Salary.Backend.Controllers
             {
                 logger.LogWarning("using mock author");
                 var authorId = Guid.NewGuid();
-                var salary = mapper.Map<Models.Salary>(info);
+                var salary = mapper.Map<SalaryModel>(info);
                 var updated = await eventSalaryContext.UpdatePlaceInfo(eventId, placeId, salary, authorId).ConfigureAwait(false);
                 return mapper.Map<EventSalaryFullView>(updated);
             }

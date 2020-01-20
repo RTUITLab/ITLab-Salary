@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ITLab.Salary.Models
 {
-    public class Salary
+    public class SalaryModel
     {
         public int Count { get; set; }
         public string Description { get; set; }

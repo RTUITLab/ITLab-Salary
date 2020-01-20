@@ -6,10 +6,12 @@ using System.Reflection;
 using System.Threading.Tasks;
 using AutoMapper;
 using ITLab.Salary.Backend.Formatting;
+using ITLab.Salary.Backend.Models.Options;
 using ITLab.Salary.Backend.Services;
 using ITLab.Salary.Backend.Services.Configure;
 using ITLab.Salary.Backend.Swagger;
 using ITLab.Salary.Database;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -24,11 +26,11 @@ using Microsoft.OpenApi.Models;
 using RTUITLab.AspNetCore.Configure.Configure;
 using RTUITLab.AspNetCore.Configure.Invokations;
 using Swashbuckle.AspNetCore.SwaggerGen;
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable CA1822 // Mark members as static
 
 namespace ITLab.Salary.Backend
 {
-#pragma warning disable CS1591
-#pragma warning disable CA1822
 
     public class Startup
     {
@@ -39,14 +41,40 @@ namespace ITLab.Salary.Backend
 
         public IConfiguration Configuration { get; }
 
+        private bool IsTests => Configuration.GetValue<bool>("TESTS");
+
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<JwtOptions>(Configuration.GetSection(nameof(JwtOptions)));
+
             services.AddControllers();
 
             services.AddSingleton<IDbFactory, ConcurrentDictionaryDbFactory>();
             services.AddTransient<EventSalaryContext>();
 
             services.AddAutoMapper(typeof(Requests));
+
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    var jwtOptions = Configuration.GetSection(nameof(JwtOptions)).Get<JwtOptions>();
+                    options.Audience = jwtOptions.Audience;
+                    options.TokenValidationParameters.ValidateAudience = true;
+                    if (IsTests)
+                    {
+                        options.RequireHttpsMetadata = false;
+                        options.TokenValidationParameters.IssuerSigningKey = JwtTestsHelper.IssuerSigningKey(jwtOptions.DebugKey);
+                        options.TokenValidationParameters.ValidateLifetime = false;
+                        options.TokenValidationParameters.ValidateIssuer = false;
+                    }
+                    else
+                    {
+                        options.Authority = jwtOptions.Authority;
+                        options.RequireHttpsMetadata = false;
+                        options.TokenValidationParameters.ValidateLifetime = true;
+                    }
+                });
 
             services.AddApiVersioning(
                 options =>
@@ -77,7 +105,8 @@ namespace ITLab.Salary.Backend
                 });
 
             services.AddWebAppConfigure()
-                .AddTransientConfigure<MigrateMongoDbWork>(0);
+                .AddTransientConfigure<MigrateMongoDbWork>(0)
+                .AddTransientConfigure<ShowTestAdminTokenWork>(IsTests, 1);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider provider)
@@ -91,6 +120,7 @@ namespace ITLab.Salary.Backend
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
@@ -121,6 +151,6 @@ namespace ITLab.Salary.Backend
             }
         }
     }
-#pragma warning restore CS1591
-#pragma warning restore CA1822
 }
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning restore CA1822 // Mark members as static

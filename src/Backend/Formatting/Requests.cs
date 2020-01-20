@@ -19,7 +19,7 @@ namespace ITLab.Salary.Backend.Formatting
         public Requests()
         {
 
-            CreateMap<SalaryInfo, Models.Salary>();
+            CreateMap<SalaryInfo, SalaryModel>();
 
             CreateMap<PlaceSalaryCreate, PlaceSalary>();
             CreateMap<ShiftSalaryCreate, ShiftSalary>();

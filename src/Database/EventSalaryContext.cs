@@ -83,7 +83,7 @@ namespace ITLab.Salary.Database
             await SaveToHistory(eventSalary).ConfigureAwait(false);
         }
 
-        public async Task<EventSalary> UpdateEvenInfo(Guid eventId, Models.Salary info, Guid authorId)
+        public async Task<EventSalary> UpdateEvenInfo(Guid eventId, Models.SalaryModel info, Guid authorId)
         {
             info = info ?? throw new ArgumentNullException(nameof(info));
 
@@ -103,7 +103,7 @@ namespace ITLab.Salary.Database
         }
 
 
-        public async Task<EventSalary> AddShift(Guid eventId, Guid shiftId, Models.Salary salary, Guid authorId)
+        public async Task<EventSalary> AddShift(Guid eventId, Guid shiftId, Models.SalaryModel salary, Guid authorId)
         {
             salary = salary ?? throw new ArgumentNullException(nameof(salary));
             var now = DateTime.UtcNow;
@@ -139,7 +139,7 @@ namespace ITLab.Salary.Database
             return updated;
         }
 
-        public async Task<EventSalary> UpdateShiftInfo(Guid eventId, Guid shiftId, Models.Salary info, Guid authorId)
+        public async Task<EventSalary> UpdateShiftInfo(Guid eventId, Guid shiftId, Models.SalaryModel info, Guid authorId)
         {
             info = info ?? throw new ArgumentNullException(nameof(info));
             var updated = await Collection.FindOneAndUpdateAsync(
@@ -159,7 +159,7 @@ namespace ITLab.Salary.Database
         public async Task<EventSalary> AddPlace(
             Guid eventId,
             Guid placeId,
-            Models.Salary info,
+            Models.SalaryModel info,
             Guid authorId)
         {
             info = info ?? throw new ArgumentNullException(nameof(info));
@@ -202,7 +202,7 @@ namespace ITLab.Salary.Database
         public async Task<EventSalary> UpdatePlaceInfo(
             Guid eventId,
             Guid placeId,
-            Models.Salary info,
+            Models.SalaryModel info,
             Guid authorId)
         {
             info = info ?? throw new ArgumentNullException(nameof(info));
