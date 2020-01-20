@@ -128,10 +128,8 @@ namespace ITLab.Salary.Backend.Controllers
         {
             try
             {
-                logger.LogWarning("using mock author");
-                var authorId = Guid.NewGuid();
                 var salary = mapper.Map<SalaryModel>(info);
-                var updated = await eventSalaryContext.UpdateEvenInfo(eventId, salary, authorId).ConfigureAwait(false);
+                var updated = await eventSalaryContext.UpdateEvenInfo(eventId, salary, UserId).ConfigureAwait(false);
                 return mapper.Map<EventSalaryFullView>(updated);
             }
             catch (NotFoundException nfe)
@@ -159,10 +157,8 @@ namespace ITLab.Salary.Backend.Controllers
         {
             try
             {
-                logger.LogWarning("using mock author");
-                var authorId = Guid.NewGuid();
                 var salary = mapper.Map<SalaryModel>(info);
-                var updated = await eventSalaryContext.AddShift(eventId, shiftId, salary, authorId).ConfigureAwait(false);
+                var updated = await eventSalaryContext.AddShift(eventId, shiftId, salary, UserId).ConfigureAwait(false);
                 return mapper.Map<EventSalaryFullView>(updated);
             }
             catch (BadRequestException bre)
@@ -191,10 +187,8 @@ namespace ITLab.Salary.Backend.Controllers
         {
             try
             {
-                logger.LogWarning("using mock author");
-                var authorId = Guid.NewGuid();
                 var salary = mapper.Map<SalaryModel>(info);
-                var updated = await eventSalaryContext.UpdateShiftInfo(eventId, shiftId, salary, authorId).ConfigureAwait(false);
+                var updated = await eventSalaryContext.UpdateShiftInfo(eventId, shiftId, salary, UserId).ConfigureAwait(false);
                 return mapper.Map<EventSalaryFullView>(updated);
             }
             catch (NotFoundException nfe)
@@ -221,10 +215,8 @@ namespace ITLab.Salary.Backend.Controllers
         {
             try
             {
-                logger.LogWarning("using mock author");
-                var authorId = Guid.NewGuid();
                 var salary = mapper.Map<SalaryModel>(info);
-                var updated = await eventSalaryContext.AddPlace(eventId, placeId, salary, authorId).ConfigureAwait(false);
+                var updated = await eventSalaryContext.AddPlace(eventId, placeId, salary, UserId).ConfigureAwait(false);
                 return mapper.Map<EventSalaryFullView>(updated);
             }
             catch (BadRequestException bre)
@@ -256,10 +248,8 @@ namespace ITLab.Salary.Backend.Controllers
         {
             try
             {
-                logger.LogWarning("using mock author");
-                var authorId = Guid.NewGuid();
                 var salary = mapper.Map<SalaryModel>(info);
-                var updated = await eventSalaryContext.UpdatePlaceInfo(eventId, placeId, salary, authorId).ConfigureAwait(false);
+                var updated = await eventSalaryContext.UpdatePlaceInfo(eventId, placeId, salary, UserId).ConfigureAwait(false);
                 return mapper.Map<EventSalaryFullView>(updated);
             }
             catch (NotFoundException nfe)

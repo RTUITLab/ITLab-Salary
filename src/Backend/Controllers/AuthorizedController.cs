@@ -19,7 +19,7 @@ namespace ITLab.Salary.Backend.Controllers
         /// <summary>
         /// Sender userId
         /// </summary>
-        public Guid UserId
+        protected Guid UserId
         {
             get
             {
