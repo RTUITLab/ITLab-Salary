@@ -8,7 +8,7 @@ stages:
 - stage: build
 
   jobs:
-  - job: build
+  - job: build_salary_api
     pool:
       vmImage: ubuntu-latest
     steps:
@@ -41,6 +41,14 @@ stages:
       inputs:
         ArtifactName: 'itlab-salary-build'
 
+  - job: publish_deploy_artifacts
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - checkout: self
+      clean: true
+      fetchDepth: 1
+
     - task: CopyFiles@2
       displayName: 'copy deploy artifact'
       inputs:
@@ -62,7 +70,9 @@ stages:
       vmImage: ubuntu-latest
 
     steps:
-
+    - checkout: self
+      clean: true
+      fetchDepth: 1
     - task: DownloadPipelineArtifact@2
       inputs:
         buildType: 'current'
@@ -88,10 +98,16 @@ stages:
         script: |
           docker-compose --no-ansi rm -f -s
         workingDirectory: './tests/e2e'
-
+    - task: CopyFiles@2
+      displayName: copy JUnit files to ArtifactStagingDirectory
+      inputs:
+        SourceFolder: tests/e2e/out
+        Contents: '**'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+        CleanTargetFolder: true
     - task: PublishTestResults@2
       inputs:
         testResultsFormat: 'JUnit'
         testResultsFiles: 'testmace*.xml'
-        searchFolder: 'tests/e2e/out'
+        searchFolder: '$(Build.ArtifactStagingDirectory)'
         failTaskOnFailedTests: true
