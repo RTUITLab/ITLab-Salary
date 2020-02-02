@@ -22,7 +22,7 @@ settings:
 requestData:
   headers:
     - isChecked: true
-      name: ' Authorization'
+      name: Authorization
       value: 'Bearer ${$env.jwt}'
   disabledInheritedHeaders: []
   strictSSL: 'No'
