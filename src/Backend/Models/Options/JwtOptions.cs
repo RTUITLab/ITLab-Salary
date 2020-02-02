@@ -19,6 +19,10 @@ namespace ITLab.Salary.Backend.Models.Options
         /// </summary>
         public string Audience { get; set; }
         /// <summary>
+        /// Scope for salaey API
+        /// </summary>
+        public string Scope { get; set; }
+        /// <summary>
         /// Key for signing debug tokens
         /// </summary>
         public string DebugKey { get; set; }

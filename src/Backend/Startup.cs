@@ -12,10 +12,12 @@ using ITLab.Salary.Backend.Services.Configure;
 using ITLab.Salary.Backend.Swagger;
 using ITLab.Salary.Database;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -47,7 +49,15 @@ namespace ITLab.Salary.Backend
         {
             services.Configure<JwtOptions>(Configuration.GetSection(nameof(JwtOptions)));
 
-            services.AddControllers();
+            services.AddControllers(options =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                     .RequireAuthenticatedUser()
+                     .AddAuthenticationSchemes("Bearer")
+                     .RequireClaim("scope", Configuration.GetSection(nameof(JwtOptions)).GetValue<string>(nameof(JwtOptions.Scope)))
+                     .Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
+            });
 
             services.AddSingleton<IDbFactory, ConcurrentDictionaryDbFactory>();
             services.AddTransient<EventSalaryContext>();
