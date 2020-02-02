@@ -9,7 +9,7 @@ environments:
         eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImUzOGMzNWMyLTE4ZGEtNDE1Ni05ZmVhLWI4NTQ5YzczNmFiNSIsImF1ZCI6Iml0bGFiIiwic2NvcGUiOiJpdGxhYi5zYWxhcnkifQ.je7NX4MtEpTrWisfioNmDSzMn7ggpymnE7NixTpCGBs
     e2e:
       basePath: 'http://test-salary-api'
-    jwt: >-
+      jwt: >-
         eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImUzOGMzNWMyLTE4ZGEtNDE1Ni05ZmVhLWI4NTQ5YzczNmFiNSIsImF1ZCI6Iml0bGFiIiwic2NvcGUiOiJpdGxhYi5zYWxhcnkifQ.je7NX4MtEpTrWisfioNmDSzMn7ggpymnE7NixTpCGBs
 children:
   - v1.0
@@ -22,7 +22,7 @@ settings:
 requestData:
   headers:
     - isChecked: true
-      name: Authorization
+      name: ' Authorization'
       value: 'Bearer ${$env.jwt}'
   disabledInheritedHeaders: []
   strictSSL: 'No'
