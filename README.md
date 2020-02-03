@@ -15,7 +15,7 @@ test | [![master tests](https://img.shields.io/azure-devops/tests/RTUITLab/RTU%2
 
 Example configuration file
 
-```json
+```jsonc
 {
   "ConnectionStrings": {
     "MongoDb": "mongodb://localhost:27017/itlabsalarydevelop2" // connection string to mongodb

@@ -6,11 +6,11 @@ environments:
     localEnv:
       basePath: 'http://localhost:5003'
       jwt: >-
-        eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImUzOGMzNWMyLTE4ZGEtNDE1Ni05ZmVhLWI4NTQ5YzczNmFiNSIsImF1ZCI6Iml0bGFiLnNhbGFyeSJ9.oO8f70etDisjFOLT4zMWMamLqmSrAJkUL_cvHdF3vRQ
+        eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImUzOGMzNWMyLTE4ZGEtNDE1Ni05ZmVhLWI4NTQ5YzczNmFiNSIsImF1ZCI6Iml0bGFiIiwic2NvcGUiOiJpdGxhYi5zYWxhcnkifQ.je7NX4MtEpTrWisfioNmDSzMn7ggpymnE7NixTpCGBs
     e2e:
       basePath: 'http://test-salary-api'
       jwt: >-
-        eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImUzOGMzNWMyLTE4ZGEtNDE1Ni05ZmVhLWI4NTQ5YzczNmFiNSIsImF1ZCI6Iml0bGFiLnNhbGFyeSJ9.oO8f70etDisjFOLT4zMWMamLqmSrAJkUL_cvHdF3vRQ
+        eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImUzOGMzNWMyLTE4ZGEtNDE1Ni05ZmVhLWI4NTQ5YzczNmFiNSIsImF1ZCI6Iml0bGFiIiwic2NvcGUiOiJpdGxhYi5zYWxhcnkifQ.je7NX4MtEpTrWisfioNmDSzMn7ggpymnE7NixTpCGBs
 children:
   - v1.0
 variables: {}
