@@ -5,6 +5,7 @@ children:
   - Edit place salary
   - Edit place salary on incorrect event id
   - Check is target place updated
+  - Delete place salary
 variables:
   editPlaceCount: '2000'
   editPlaceDescription: Edited place description

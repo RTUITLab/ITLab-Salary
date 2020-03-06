@@ -193,6 +193,30 @@ namespace ITLab.Salary.Backend.Controllers
         }
 
         /// <summary>
+        /// Delete shift salary info of event salary
+        /// </summary>
+        /// <param name="eventId">Target event id</param>
+        /// <param name="shiftId">Target shift id</param>
+        /// <response code="200">Returns the updated item</response>
+        /// <response code="404">Event or shift salary not found</response>
+        /// <returns></returns>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
+        [HttpDelete("{eventId}/shift/{shiftId}")]
+        public async Task<ActionResult<EventSalaryFullView>> DeleteShiftSalaryInfo(Guid eventId, Guid shiftId)
+        {
+            try
+            {
+                var updated = await eventSalaryContext.DeleteShiftInfo(eventId, shiftId, UserId).ConfigureAwait(false);
+                return mapper.Map<EventSalaryFullView>(updated);
+            }
+            catch (NotFoundException nfe)
+            {
+                return NotFound(nfe.Message);
+            }
+        }
+
+        /// <summary>
         /// Update place salary info of event salary
         /// </summary>
         /// <param name="eventId">Target event id</param>
@@ -213,6 +237,30 @@ namespace ITLab.Salary.Backend.Controllers
             {
                 var salary = mapper.Map<SalaryModel>(info);
                 var updated = await eventSalaryContext.UpdatePlaceInfo(eventId, placeId, salary, UserId).ConfigureAwait(false);
+                return mapper.Map<EventSalaryFullView>(updated);
+            }
+            catch (NotFoundException nfe)
+            {
+                return NotFound(nfe.Message);
+            }
+        }
+
+        /// <summary>
+        /// Delete place salary info of event salary
+        /// </summary>
+        /// <param name="eventId">Target event id</param>
+        /// <param name="placeId">Target place id</param>
+        /// <response code="200">Returns the updated item</response>
+        /// <response code="404">Event or shift salary not found</response>
+        /// <returns></returns>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
+        [HttpDelete("{eventId}/place/{placeId}")]
+        public async Task<ActionResult<EventSalaryFullView>> DeletePlaceSalaryInfo(Guid eventId, Guid placeId)
+        {
+            try
+            {
+                var updated = await eventSalaryContext.DeletePlaceInfo(eventId, placeId, UserId).ConfigureAwait(false);
                 return mapper.Map<EventSalaryFullView>(updated);
             }
             catch (NotFoundException nfe)

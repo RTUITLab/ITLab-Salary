@@ -5,8 +5,9 @@ type: RequestStep
 assignVariables: []
 requestData:
   request:
-    method: GET
-    url: '${$env.basePath}/salary/v1/event/'
+    method: DELETE
+    url: >-
+      ${$env.basePath}/salary/v1/event/${newEventSalaryEventId}/shift/${newShiftId}
   headers: []
   disabledInheritedHeaders: []
   params: []
@@ -21,4 +22,4 @@ requestData:
   strictSSL: Inherit
 authData:
   type: inherit
-name: Start with empry event salary
+name: Delete shift salary
