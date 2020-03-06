@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using System.Linq.Expressions;
 using ITLab.Salary.Shared.Exceptions;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Threading;
 
 namespace ITLab.Salary.Database
 {
@@ -30,19 +32,22 @@ namespace ITLab.Salary.Database
 
         private IMongoCollection<EventSalary> Collection => mongoDatabase.GetCollection<EventSalary>(EventSalaryCollectionName);
         private IMongoCollection<HistoryRecord<EventSalary>> History => mongoDatabase.GetCollection<HistoryRecord<EventSalary>>(EventSalaryHistoryCollectionName);
-        private Task SaveToHistory(EventSalary eventSalary)
+        private Task SaveToHistory(EventSalary eventSalary, HistoryRecordType historyType = HistoryRecordType.Update)
         {
             return History.InsertOneAsync(new HistoryRecord<EventSalary>
             {
                 SavedDate = DateTime.UtcNow,
-                Object = eventSalary
+                Object = eventSalary,
+                Type = historyType
             });
         }
 
 
-        public Task<List<EventSalary>> GetAll()
+        public async Task<List<EventSalary>> GetAll()
         {
-            return Collection.Find(Builders<EventSalary>.Filter.Empty).ToListAsync();
+            return (await Collection.Find(Builders<EventSalary>.Filter.Empty).ToListAsync().ConfigureAwait(false))
+                    .Select(Clean)
+                    .ToList();
         }
 
         public Task<List<T>> GetAll<T>(Expression<Func<EventSalary, T>> projection)
@@ -50,9 +55,9 @@ namespace ITLab.Salary.Database
             return Collection.Find(Builders<EventSalary>.Filter.Empty).Project(projection).ToListAsync();
         }
 
-        public Task<EventSalary> GetOneOrDefault(Guid eventId)
+        public async Task<EventSalary> GetOneOrDefault(Guid eventId)
         {
-            return Collection.Find(es => es.EventId == eventId).SingleOrDefaultAsync();
+            return (Clean(await Collection.Find(es => es.EventId == eventId).SingleOrDefaultAsync().ConfigureAwait(false)));
         }
 
         public Task<T> GetOneOrDefault<T>(Guid eventId, Expression<Func<EventSalary, T>> projection)
@@ -60,7 +65,7 @@ namespace ITLab.Salary.Database
             return Collection.Find(es => es.EventId == eventId).Project(projection).SingleOrDefaultAsync();
         }
 
-        public async Task AddNew(Guid eventId, EventSalary eventSalary, Guid authorId)
+        public async Task<EventSalary> AddNew(Guid eventId, EventSalary eventSalary, Guid authorId)
         {
             eventSalary = eventSalary ?? throw new ArgumentNullException(nameof(eventSalary));
             var now = DateTime.UtcNow;
@@ -69,21 +74,22 @@ namespace ITLab.Salary.Database
             eventSalary.AuthorId = authorId;
             eventSalary?.ShiftSalaries.ForEach(ss =>
             {
-                ss.Created = ss.ModificationDate = now;
+                ss.ModificationDate = now;
                 ss.AuthorId = authorId;
-                
+
             });
             eventSalary?.PlaceSalaries.ForEach(ps =>
             {
-                ps.Created = ps.ModificationDate = now;
+                ps.ModificationDate = now;
                 ps.AuthorId = authorId;
             });
 
             await Collection.InsertOneAsync(eventSalary).ConfigureAwait(false);
             await SaveToHistory(eventSalary).ConfigureAwait(false);
+            return Clean(eventSalary);
         }
 
-        public async Task<EventSalary> UpdateEvenInfo(Guid eventId, Models.SalaryModel info, Guid authorId)
+        public async Task<EventSalary> UpdateEvenInfo(Guid eventId, SalaryModel info, Guid authorId)
         {
             info = info ?? throw new ArgumentNullException(nameof(info));
 
@@ -99,104 +105,50 @@ namespace ITLab.Salary.Database
             if (updated == null)
                 throw new NotFoundException("Not found event salary");
             await SaveToHistory(updated).ConfigureAwait(false);
-            return updated;
-        }
-
-
-        public async Task<EventSalary> AddShift(Guid eventId, Guid shiftId, Models.SalaryModel salary, Guid authorId)
-        {
-            salary = salary ?? throw new ArgumentNullException(nameof(salary));
-            var now = DateTime.UtcNow;
-
-            var shiftSalary = new ShiftSalary
-            {
-                AuthorId = authorId,
-                Count = salary.Count,
-                Description = salary.Description,
-                ShiftId = shiftId,
-                Created = now,
-                ModificationDate = now
-            };
-            var updated = await Collection.FindOneAndUpdateAsync(
-                Builders<EventSalary>.Filter.And(
-                    Builders<EventSalary>.Filter.Eq(es => es.EventId, eventId),
-                    Builders<EventSalary>.Filter.Ne($"{nameof(Models.EventSalary.ShiftSalaries)}.{nameof(Models.ShiftSalary.ShiftId)}", shiftId)
-                ),
-                Builders<EventSalary>.Update
-                    .Push(es => es.ShiftSalaries, shiftSalary),
-                new FindOneAndUpdateOptions<EventSalary, EventSalary> { ReturnDocument = ReturnDocument.After }
-                ).ConfigureAwait(false);
-            if (updated == null)
-            {
-                var targetEventSalary = await GetOneOrDefault(eventId, es => new { es.EventId, ssids = es.ShiftSalaries.Select(ss => ss.ShiftId) }).ConfigureAwait(false);
-                if (targetEventSalary == null)
-                    throw new NotFoundException("Not found event salary");
-                if (targetEventSalary.ssids.Contains(shiftId))
-                    throw new BadRequestException("Shift salary in event salary already exists");
-                throw new Exception("Error while shift salary adding");
-            }
-            await SaveToHistory(updated).ConfigureAwait(false);
-            return updated;
+            return Clean(updated);
         }
 
         public async Task<EventSalary> UpdateShiftInfo(Guid eventId, Guid shiftId, Models.SalaryModel info, Guid authorId)
         {
             info = info ?? throw new ArgumentNullException(nameof(info));
-            var updated = await Collection.FindOneAndUpdateAsync(
-                Builders<EventSalary>.Filter.Where(es => es.EventId == eventId && es.ShiftSalaries.Any(ss => ss.ShiftId == shiftId)),
-                Builders<EventSalary>.Update
-                    .Set(es => es.ShiftSalaries[-1].ModificationDate, DateTime.UtcNow)
-                    .Set(es => es.ShiftSalaries[-1].AuthorId, authorId)
-                    .Set(es => es.ShiftSalaries[-1].Description, info.Description)
-                    .Set(es => es.ShiftSalaries[-1].Count, info.Count),
-                new FindOneAndUpdateOptions<EventSalary, EventSalary> { ReturnDocument = ReturnDocument.After }).ConfigureAwait(false);
-            if (updated == null)
-                throw new NotFoundException("Event or shift salary not found");
-            await SaveToHistory(updated).ConfigureAwait(false);
-            return updated;
-        }
-
-        public async Task<EventSalary> AddPlace(
-            Guid eventId,
-            Guid placeId,
-            Models.SalaryModel info,
-            Guid authorId)
-        {
-            info = info ?? throw new ArgumentNullException(nameof(info));
-
-            var now = DateTime.UtcNow;
-
-            var placeSalary = new PlaceSalary
+            try
             {
-                AuthorId = authorId,
-                Count = info.Count,
-                Description = info.Description,
-                PlaceId = placeId,
-                Created = now,
-                ModificationDate = now
-            };
+                var now = DateTime.UtcNow;
+                // Add new shift information
+                var updated = await Collection.FindOneAndUpdateAsync(
+                    Builders<EventSalary>.Filter.Where(es => es.EventId == eventId),
+                    Builders<EventSalary>.Update
+                        .Push(es => es.ShiftSalaries, new ShiftSalary
+                        {
+                            ModificationDate = now,
+                            AuthorId = authorId,
+                            Description = info.Description,
+                            Count = info.Count,
+                            ShiftId = shiftId
+                        }),
+                    new FindOneAndUpdateOptions<EventSalary, EventSalary> { ReturnDocument = ReturnDocument.After }).ConfigureAwait(false);
+                if (updated == null)
+                    throw new NotFoundException("Event salary not found");
+                await SaveToHistory(updated).ConfigureAwait(false);
 
-            var updated = await Collection.FindOneAndUpdateAsync(
-                Builders<EventSalary>.Filter.And(
-                    Builders<EventSalary>.Filter.Eq(es => es.EventId, eventId),
-                    Builders<EventSalary>.Filter.Ne($"{nameof(Models.EventSalary.PlaceSalaries)}.{nameof(Models.PlaceSalary.PlaceId)}", placeId)
-                ),
-                Builders<EventSalary>.Update
-                    .Push(es => es.PlaceSalaries, placeSalary),
-                new FindOneAndUpdateOptions<EventSalary, EventSalary> { ReturnDocument = ReturnDocument.After }
-                ).ConfigureAwait(false);
-            if (updated == null)
-            {
-                var targetEventSalary = await GetOneOrDefault(eventId, es => new { es.EventId, psids = es.PlaceSalaries.Select(ss => ss.PlaceId) }).ConfigureAwait(false);
+                // Remove old information
+                updated = await Collection.FindOneAndUpdateAsync(
+                    Builders<EventSalary>.Filter.Where(es => es.EventId == eventId),
+                    Builders<EventSalary>.Update
+                        .PullFilter(
+                            es => es.ShiftSalaries,
+                            ss => ss.ShiftId == shiftId && ss.ModificationDate < now),
+                    new FindOneAndUpdateOptions<EventSalary, EventSalary> { ReturnDocument = ReturnDocument.After }).ConfigureAwait(false);
+                if (updated == null)
+                    throw new NotFoundException("Event salary not found");
+                await SaveToHistory(updated).ConfigureAwait(false);
 
-                if (targetEventSalary == null)
-                    throw new NotFoundException("Not found event salary");
-                if (targetEventSalary.psids.Contains(placeId))
-                    throw new BadRequestException("Place salary in event salary already exists");
-                throw new Exception("Error while place salary adding");
+                return Clean(updated);
             }
-            await SaveToHistory(updated).ConfigureAwait(false);
-            return updated;
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         public async Task<EventSalary> UpdatePlaceInfo(
@@ -206,18 +158,62 @@ namespace ITLab.Salary.Database
             Guid authorId)
         {
             info = info ?? throw new ArgumentNullException(nameof(info));
+            var now = DateTime.UtcNow;
             var updated = await Collection.FindOneAndUpdateAsync(
-                Builders<EventSalary>.Filter.Where(es => es.EventId == eventId && es.PlaceSalaries.Any(ps => ps.PlaceId == placeId)),
+                Builders<EventSalary>.Filter.Where(es => es.EventId == eventId),
                 Builders<EventSalary>.Update
-                    .Set(es => es.PlaceSalaries[-1].ModificationDate, DateTime.UtcNow)
-                    .Set(es => es.PlaceSalaries[-1].AuthorId, authorId)
-                    .Set(es => es.PlaceSalaries[-1].Description, info.Description)
-                    .Set(es => es.PlaceSalaries[-1].Count, info.Count),
+                    .Push(es => es.PlaceSalaries, new PlaceSalary
+                    {
+                        PlaceId = placeId,
+                        AuthorId = authorId,
+                        Count = info.Count,
+                        Description = info.Description,
+                        ModificationDate = now
+                    }),
                 new FindOneAndUpdateOptions<EventSalary, EventSalary> { ReturnDocument = ReturnDocument.After }).ConfigureAwait(false);
             if (updated == null)
-                throw new NotFoundException("Event or place salary not found");
+                throw new NotFoundException("Event salary not found");
             await SaveToHistory(updated).ConfigureAwait(false);
-            return updated;
+
+            updated = await Collection.FindOneAndUpdateAsync(
+                Builders<EventSalary>.Filter.Where(es => es.EventId == eventId),
+                Builders<EventSalary>.Update
+                    .PullFilter(es => es.PlaceSalaries, 
+                        ps => ps.PlaceId == placeId && ps.ModificationDate < now),
+                new FindOneAndUpdateOptions<EventSalary, EventSalary> { ReturnDocument = ReturnDocument.After }).ConfigureAwait(false);
+            if (updated == null)
+                throw new NotFoundException("Event salary not found");
+            await SaveToHistory(updated).ConfigureAwait(false);
+
+            return Clean(updated);
+        }
+
+        public async Task Delete(Guid eventId, Guid userId)
+        {
+            var deleted = await Collection.FindOneAndDeleteAsync(
+                Builders<EventSalary>.Filter.Where(es => es.EventId == eventId)).ConfigureAwait(false);
+            if (deleted == null)
+                throw new NotFoundException("Can't delete event salary");
+            deleted.ModificationDate = DateTime.UtcNow;
+            deleted.AuthorId = userId;
+            await SaveToHistory(deleted, HistoryRecordType.Delete).ConfigureAwait(false);
+        }
+
+        private EventSalary Clean(EventSalary eventSalary)
+        {
+            var set = new HashSet<Guid>();
+            foreach (var shiftSalary in eventSalary.ShiftSalaries.ToArray())
+            {
+                if (!set.Add(shiftSalary.ShiftId))
+                    eventSalary.ShiftSalaries.Remove(shiftSalary);
+            }
+            set.Clear();
+            foreach (var placeSalary in eventSalary.PlaceSalaries.ToArray())
+            {
+                if (!set.Add(placeSalary.PlaceId))
+                    eventSalary.PlaceSalaries.Remove(placeSalary);
+            }
+            return eventSalary;
         }
     }
 }

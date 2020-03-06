@@ -13,5 +13,6 @@ namespace ITLab.Salary.Database
         public string Id { get; set; }
         public DateTime SavedDate { get; set; }
         public T Object { get; set; }
+        public HistoryRecordType Type { get; set; }
     }
 }
