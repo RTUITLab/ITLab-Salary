@@ -5,15 +5,15 @@ type: RequestStep
 assignVariables: []
 requestData:
   request:
-    method: POST
+    method: PUT
     url: >-
-      ${$env.basePath}/salary/v1/event/${newEventSalaryEventId}/shift/${newShiftId}
+      ${$env.basePath}/salary/v1/event/${newEventSalaryEventId}/place/${newPlaceId}
   headers: []
   disabledInheritedHeaders: []
   params: []
   body:
     type: Json
-    jsonBody: "{\r\n  \"count\": ${newShiftCount},\r\n  \"description\": \"${newShiftDescription}\"\r\n}"
+    jsonBody: "{\r\n  \"count\": ${newPlaceCount},\r\n  \"description\": \"${newPlaceDescription}\"\r\n}"
     xmlBody: ''
     textBody: ''
     formData: []
@@ -22,4 +22,4 @@ requestData:
   strictSSL: Inherit
 authData:
   type: inherit
-name: Cant add new shift salary with same id
+name: Add new place to shift salary

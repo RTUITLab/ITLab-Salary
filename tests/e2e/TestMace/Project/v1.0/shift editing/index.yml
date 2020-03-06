@@ -1,11 +1,15 @@
 children:
+  - Check is no shifts in event salary
+  - Create shift salary
   - Check is target shift exists
-  - Edit shift salary
   - Edit shift salary on incorrect event id
-  - Edit shift salary on incorrect shift id
+  - Edit shift salary
+  - Check is target shift updated
 variables:
   editShiftCount: '200'
   editShiftDescription: Edited shift description
+  newShiftCount: '100'
+  newShiftDescription: Created shift description
 type: Folder
 authData:
   type: inherit

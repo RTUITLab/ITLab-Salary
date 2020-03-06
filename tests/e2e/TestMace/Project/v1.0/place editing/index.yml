@@ -1,11 +1,15 @@
 children:
+  - Check is no places in event salary
+  - Add new place to shift salary
   - Check is target place exists
   - Edit place salary
   - Edit place salary on incorrect event id
-  - Edit shift salary on incorrect place id
+  - Check is target place updated
 variables:
   editPlaceCount: '2000'
   editPlaceDescription: Edited place description
+  newPlaceCount: '409'
+  newPlaceDescription: new place description
 type: Folder
 authData:
   type: inherit

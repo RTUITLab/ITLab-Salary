@@ -8,7 +8,6 @@ namespace ITLab.Salary.Models
 {
     public class MetaSalary : SalaryModel
     {
-        public DateTime Created { get; set; }
         public DateTime ModificationDate { get; set; }
         public Guid AuthorId { get; set; }
     }

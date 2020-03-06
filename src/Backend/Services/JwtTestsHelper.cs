@@ -33,7 +33,7 @@ namespace ITLab.Salary.Backend.Services
             var credentials = new SigningCredentials(IssuerSigningKey(jwtOptions.DebugKey), SecurityAlgorithms.HmacSha256);
 
             var claims = new Claim[] {
-                new Claim(ClaimTypes.NameIdentifier, jwtOptions.DebugAdminUserId.ToString()),
+                new Claim("sub", jwtOptions.DebugAdminUserId.ToString()),
                 new Claim("aud", jwtOptions.Audience),
                 new Claim("scope", jwtOptions.Scope)
             };
