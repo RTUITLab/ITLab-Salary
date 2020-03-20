@@ -3,7 +3,6 @@ variables: {}
 type: Script
 name: Test count changed
 script: |
-
-  assert.equal(tm.currentNode.dynamicVars.salaryCount2
-             - tm.currentNode.dynamicVars.salaryCount,
+  assert.equal(tm.currentNode.prev.response.body.length
+             - tm.currentNode.prev.prev.prev.response.body.length,
        1, "event salary must be created");
