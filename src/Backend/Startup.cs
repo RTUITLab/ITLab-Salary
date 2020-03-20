@@ -185,7 +185,7 @@ namespace ITLab.Salary.Backend
             });
             app.UseSwaggerUI(c =>
             {
-                c.RoutePrefix = "salary/swagger";
+                c.RoutePrefix = "api/salary/swagger";
                 // build a swagger endpoint for each discovered API version
                 foreach (var description in provider.ApiVersionDescriptions)
                 {
