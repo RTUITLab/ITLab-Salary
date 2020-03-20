@@ -22,7 +22,7 @@ namespace ITLab.Salary.Backend.Controllers
     /// </summary>
     [ApiVersion("1.0")]
     [Produces("application/json")]
-    [Route("salary/v{version:apiVersion}/event")]
+    [Route("api/salary/v{version:apiVersion}/event")]
     public class EventSalaryController : AuthorizedController
     {
         private readonly EventSalaryContext eventSalaryContext;
