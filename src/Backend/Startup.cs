@@ -181,7 +181,7 @@ namespace ITLab.Salary.Backend
             });
             app.UseSwagger(setup =>
             {
-                setup.RouteTemplate = "/salary/swagger/{documentName}/swagger.json";
+                setup.RouteTemplate = "/api/salary/swagger/{documentName}/swagger.json";
             });
             app.UseSwaggerUI(c =>
             {
@@ -189,7 +189,7 @@ namespace ITLab.Salary.Backend
                 // build a swagger endpoint for each discovered API version
                 foreach (var description in provider.ApiVersionDescriptions)
                 {
-                    c.SwaggerEndpoint($"/salary/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
+                    c.SwaggerEndpoint($"/api/salary/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
                 }
             });
         }

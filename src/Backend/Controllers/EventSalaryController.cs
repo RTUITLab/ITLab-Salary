@@ -53,7 +53,7 @@ namespace ITLab.Salary.Backend.Controllers
         public async Task<ActionResult<IEnumerable<EventSalaryCompactView>>> GetList()
         {
             return await eventSalaryContext
-                .GetAll(es => new EventSalaryCompactView { Count = es.Count, EventId = es.EventId })
+                .GetAll(es => new EventSalaryCompactView { Count = es.Count, Description = es.Description, EventId = es.EventId })
                 .ConfigureAwait(false);
         }
 

@@ -6,7 +6,8 @@ namespace ITLab.Salary.PublicApi.Response
 {
     public class EventSalaryCompactView
     {
-        public int Count { get; set; }
         public Guid EventId { get; set; }
+        public int Count { get; set; }
+        public string Description { get; set; }
     }
 }
