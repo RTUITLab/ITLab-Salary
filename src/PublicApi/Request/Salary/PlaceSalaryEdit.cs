@@ -4,8 +4,8 @@ using System.Text;
 
 namespace ITLab.Salary.PublicApi.Request.Salary
 {
-    public class ShiftSalaryCreate : SalaryInfo
+    public class PlaceSalaryEdit : SalaryInfo
     {
-        public Guid ShiftId { get; set; }
+        public Guid PlaceId { get; set; }
     }
 }

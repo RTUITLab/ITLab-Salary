@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ITLab.Salary.Models
 {
-    public class ShiftSalary : MetaSalary
+    public class ShiftSalary : SalaryModel
     {
         public Guid ShiftId { get; set; }
     }
