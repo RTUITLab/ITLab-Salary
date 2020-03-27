@@ -5,6 +5,7 @@ children:
   - Edit shift salary on incorrect event id
   - Edit shift salary
   - Check is target shift updated
+  - Delete shift salary
 variables:
   editShiftCount: '200'
   editShiftDescription: Edited shift description

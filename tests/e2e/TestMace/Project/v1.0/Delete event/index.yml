@@ -1,0 +1,14 @@
+children:
+  - Create temp event
+  - Delete temp event
+  - Check event is deleted
+variables:
+  tempEventId: 245a0d5f-606a-4f75-8450-ffc4b34a6a1f
+type: Folder
+authData:
+  type: inherit
+requestData:
+  headers: []
+  disabledInheritedHeaders: []
+  strictSSL: Inherit
+name: Delete event

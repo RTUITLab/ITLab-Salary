@@ -21,9 +21,9 @@ namespace ITLab.Salary.Backend.Formatting
 
             CreateMap<SalaryInfo, SalaryModel>();
 
-            CreateMap<PlaceSalaryCreate, PlaceSalary>();
-            CreateMap<ShiftSalaryCreate, ShiftSalary>();
-            CreateMap<EventSalaryCreate, EventSalary>();
+            CreateMap<PlaceSalaryEdit, PlaceSalary>();
+            CreateMap<ShiftSalaryEdit, ShiftSalary>();
+            CreateMap<EventSalaryCreateEdit, EventSalary>();
         }
     }
 }

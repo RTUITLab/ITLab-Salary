@@ -5,15 +5,15 @@ type: RequestStep
 assignVariables: []
 requestData:
   request:
-    method: PUT
+    method: DELETE
     url: >-
-      ${$env.basePath}/api/salary/v1/event/${newEventSalaryEventId}/place/${newPlaceId}
+      ${$env.basePath}/api/salary/v1/event/${newEventSalaryEventId}/shift/${newShiftId}
   headers: []
   disabledInheritedHeaders: []
   params: []
   body:
     type: Json
-    jsonBody: "{\r\n  \"count\": ${newPlaceCount},\r\n  \"description\": \"${newPlaceDescription}\"\r\n}"
+    jsonBody: ''
     xmlBody: ''
     textBody: ''
     formData: []
@@ -22,4 +22,4 @@ requestData:
   strictSSL: Inherit
 authData:
   type: inherit
-name: Add new place to shift salary
+name: Delete shift salary

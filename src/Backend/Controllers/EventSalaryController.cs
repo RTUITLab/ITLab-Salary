@@ -22,7 +22,7 @@ namespace ITLab.Salary.Backend.Controllers
     /// </summary>
     [ApiVersion("1.0")]
     [Produces("application/json")]
-    [Route("salary/v{version:apiVersion}/event")]
+    [Route("api/salary/v{version:apiVersion}/event")]
     public class EventSalaryController : AuthorizedController
     {
         private readonly EventSalaryContext eventSalaryContext;
@@ -53,7 +53,7 @@ namespace ITLab.Salary.Backend.Controllers
         public async Task<ActionResult<IEnumerable<EventSalaryCompactView>>> GetList()
         {
             return await eventSalaryContext
-                .GetAll(es => new EventSalaryCompactView { Count = es.Count, EventId = es.EventId })
+                .GetAll(es => new EventSalaryCompactView { Count = es.Count, Description = es.Description, EventId = es.EventId })
                 .ConfigureAwait(false);
         }
 
@@ -66,7 +66,7 @@ namespace ITLab.Salary.Backend.Controllers
         /// <returns></returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
-        [HttpGet("{eventId}", Name = "GetOneByEventID")]
+        [HttpGet("{eventId}")]
         public async Task<ActionResult<EventSalaryFullView>> GetOne(Guid eventId)
         {
             var finded = await eventSalaryContext.GetOneOrDefault(eventId).ConfigureAwait(false);
@@ -78,61 +78,23 @@ namespace ITLab.Salary.Backend.Controllers
         }
 
         /// <summary>
-        /// Add new event salary record
+        /// Update or Create event salary info
         /// </summary>
         /// <param name="eventId">Target event id</param>
-        /// <param name="apiVersion"></param>
-        /// <param name="createRequest">Info about event salary</param>
-        /// <response code="201">Returns the newly created item</response>
-        /// <response code="400">Event salary for thayt event exists</response>
-        /// <returns></returns>
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(Dictionary<string, string>))]
-        [HttpPost("{eventId}")]
-        public async Task<ActionResult<EventSalaryFullView>> AddEventSalary(
-            Guid eventId,
-            ApiVersion apiVersion,
-            [FromBody] EventSalaryCreate createRequest)
-        {
-            apiVersion = apiVersion ?? throw new ArgumentNullException(nameof(apiVersion));
-            try
-            {
-                var es = mapper.Map<EventSalary>(createRequest);
-                es = await eventSalaryContext.AddNew(eventId, es, UserId).ConfigureAwait(false);
-                return CreatedAtRoute("GetOneByEventID", new { eventId = es.EventId, version = apiVersion.ToString() }, mapper.Map<EventSalaryFullView>(es));
-            }
-            // TODO catch exception in context
-            catch (MongoWriteException ex) when
-                  (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
-            {
-                var msd = new Dictionary<string, string>
-                {
-                    ["eventId"] = "Salary for that event exists"
-                };
-                return BadRequest(msd);
-            }
-        }
-
-        /// <summary>
-        /// Update ONLY event salary info
-        /// </summary>
-        /// <param name="eventId">Target event id</param>
-        /// <param name="info">Info to update on event level</param>
+        /// <param name="info">Event salary info</param>
         /// <response code="200">Returns the updated info</response>
-        /// <response code="404">Event salary not found</response>
         /// <returns></returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         [HttpPut("{eventId}")]
         public async Task<ActionResult<EventSalaryFullView>> UpdateEventSalaryInfo(
             Guid eventId,
-            [FromBody] SalaryInfo info)
+            [FromBody] EventSalaryCreateEdit info)
         {
             try
             {
-                var salary = mapper.Map<SalaryModel>(info);
+                var salary = mapper.Map<EventSalary>(info);
                 var updated = await eventSalaryContext.UpdateEvenInfo(eventId, salary, UserId).ConfigureAwait(false);
-                return mapper.Map<EventSalaryFullView>(updated);
+                return Ok(mapper.Map<EventSalaryFullView>(updated));
             }
             catch (NotFoundException nfe)
             {
@@ -163,61 +125,6 @@ namespace ITLab.Salary.Backend.Controllers
             catch (NotFoundException ex)
             {
                 return NotFound(ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// Update shift salary info of event salary
-        /// </summary>
-        /// <param name="eventId">Target event id</param>
-        /// <param name="shiftId">Target shift id</param>
-        /// <param name="info">New Shift salary info</param>
-        /// <response code="200">Returns the updated item</response>
-        /// <response code="404">Event or shift salary not found</response>
-        /// <returns></returns>
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
-        [HttpPut("{eventId}/shift/{shiftId}")]
-        public async Task<ActionResult<EventSalaryFullView>> UpdateShiftSalaryInfo(Guid eventId, Guid shiftId, [FromBody] SalaryInfo info)
-        {
-            try
-            {
-                var salary = mapper.Map<SalaryModel>(info);
-                var updated = await eventSalaryContext.UpdateShiftInfo(eventId, shiftId, salary, UserId).ConfigureAwait(false);
-                return mapper.Map<EventSalaryFullView>(updated);
-            }
-            catch (NotFoundException nfe)
-            {
-                return NotFound(nfe.Message);
-            }
-        }
-
-        /// <summary>
-        /// Update place salary info of event salary
-        /// </summary>
-        /// <param name="eventId">Target event id</param>
-        /// <param name="placeId">Target place id</param>
-        /// <param name="info">New Shift salary info</param>
-        /// <response code="200">Returns the updated item</response>
-        /// <response code="404">Event salary not found</response>
-        /// <returns></returns>
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
-        [HttpPut("{eventId}/place/{placeId}")]
-        public async Task<ActionResult<EventSalaryFullView>> UpdatPlaceSalaryInfo(
-            Guid eventId,
-            Guid placeId,
-            [FromBody] SalaryInfo info)
-        {
-            try
-            {
-                var salary = mapper.Map<SalaryModel>(info);
-                var updated = await eventSalaryContext.UpdatePlaceInfo(eventId, placeId, salary, UserId).ConfigureAwait(false);
-                return mapper.Map<EventSalaryFullView>(updated);
-            }
-            catch (NotFoundException nfe)
-            {
-                return NotFound(nfe.Message);
             }
         }
     }

@@ -61,53 +61,53 @@ stages:
       displayName: 'Publish Artifact: itlab-salary-deploy'
       inputs:
         ArtifactName: 'itlab-salary-deploy'
-- stage: test
+# - stage: test
 
-  jobs:
-  - job: test
+#   jobs:
+#   - job: test
 
-    pool:
-      vmImage: ubuntu-latest
+#     pool:
+#       vmImage: ubuntu-latest
 
-    steps:
-    - checkout: self
-      clean: true
-      fetchDepth: 1
-    - task: DownloadPipelineArtifact@2
-      inputs:
-        buildType: 'current'
-        artifactName: 'itlab-salary-build'
-        targetPath: './tests/e2e/salary-api/itlab-salary-build'
-    - task: CmdLine@2
-      displayName: run testmace
-      inputs:
-        script: |
-          docker-compose --no-ansi up testmace
-        workingDirectory: './tests/e2e'
+#     steps:
+#     - checkout: self
+#       clean: true
+#       fetchDepth: 1
+#     - task: DownloadPipelineArtifact@2
+#       inputs:
+#         buildType: 'current'
+#         artifactName: 'itlab-salary-build'
+#         targetPath: './tests/e2e/salary-api/itlab-salary-build'
+#     - task: CmdLine@2
+#       displayName: run testmace
+#       inputs:
+#         script: |
+#           docker-compose --no-ansi up testmace
+#         workingDirectory: './tests/e2e'
 
-    - task: CmdLine@2
-      displayName: show logs
-      inputs:
-        script: |
-          docker-compose logs test-salary-api
-        workingDirectory: './tests/e2e'
+#     - task: CmdLine@2
+#       displayName: show logs
+#       inputs:
+#         script: |
+#           docker-compose logs test-salary-api
+#         workingDirectory: './tests/e2e'
 
-    - task: CmdLine@2
-      displayName: remove all cintainers
-      inputs:
-        script: |
-          docker-compose --no-ansi rm -f -s
-        workingDirectory: './tests/e2e'
-    - task: CopyFiles@2
-      displayName: copy JUnit files to ArtifactStagingDirectory
-      inputs:
-        SourceFolder: tests/e2e/out
-        Contents: '**'
-        TargetFolder: '$(Build.ArtifactStagingDirectory)'
-        CleanTargetFolder: true
-    - task: PublishTestResults@2
-      inputs:
-        testResultsFormat: 'JUnit'
-        testResultsFiles: 'testmace*.xml'
-        searchFolder: '$(Build.ArtifactStagingDirectory)'
-        failTaskOnFailedTests: true
+#     - task: CmdLine@2
+#       displayName: remove all cintainers
+#       inputs:
+#         script: |
+#           docker-compose --no-ansi rm -f -s
+#         workingDirectory: './tests/e2e'
+#     - task: CopyFiles@2
+#       displayName: copy JUnit files to ArtifactStagingDirectory
+#       inputs:
+#         SourceFolder: tests/e2e/out
+#         Contents: '**'
+#         TargetFolder: '$(Build.ArtifactStagingDirectory)'
+#         CleanTargetFolder: true
+#     - task: PublishTestResults@2
+#       inputs:
+#         testResultsFormat: 'JUnit'
+#         testResultsFiles: 'testmace*.xml'
+#         searchFolder: '$(Build.ArtifactStagingDirectory)'
+#         failTaskOnFailedTests: true

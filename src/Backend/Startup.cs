@@ -42,6 +42,7 @@ namespace ITLab.Salary.Backend
         {
             Configuration = configuration;
         }
+        readonly string AllowAllOrigins = "_myAllowSpecificOrigins";
 
         public IConfiguration Configuration { get; }
 
@@ -147,6 +148,17 @@ namespace ITLab.Salary.Backend
             services.AddWebAppConfigure()
                 .AddTransientConfigure<MigrateMongoDbWork>(0)
                 .AddTransientConfigure<ShowTestAdminTokenWork>(IsTests, 1);
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(AllowAllOrigins,
+                builder =>
+                {
+                    builder.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+                });
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider provider)
@@ -155,7 +167,7 @@ namespace ITLab.Salary.Backend
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseCors(AllowAllOrigins);
             app.UseWebAppConfigure();
 
             app.UseRouting();
@@ -169,15 +181,15 @@ namespace ITLab.Salary.Backend
             });
             app.UseSwagger(setup =>
             {
-                setup.RouteTemplate = "/salary/swagger/{documentName}/swagger.json";
+                setup.RouteTemplate = "/api/salary/swagger/{documentName}/swagger.json";
             });
             app.UseSwaggerUI(c =>
             {
-                c.RoutePrefix = "salary/swagger";
+                c.RoutePrefix = "api/salary/swagger";
                 // build a swagger endpoint for each discovered API version
                 foreach (var description in provider.ApiVersionDescriptions)
                 {
-                    c.SwaggerEndpoint($"/salary/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
+                    c.SwaggerEndpoint($"/api/salary/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
                 }
             });
         }

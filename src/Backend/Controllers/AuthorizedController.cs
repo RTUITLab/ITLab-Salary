@@ -23,7 +23,6 @@ namespace ITLab.Salary.Backend.Controllers
         {
             get
             {
-                Console.WriteLine(HttpContext.Request.Headers["Authorization"]);
                 return Guid.Parse(HttpContext.User.FindFirst("sub").Value);
             }
         }
