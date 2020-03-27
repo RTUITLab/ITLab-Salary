@@ -12,6 +12,8 @@ using ITLab.Salary.Backend.Services;
 using ITLab.Salary.Backend.Services.Configure;
 using ITLab.Salary.Backend.Swagger;
 using ITLab.Salary.Database;
+using ITLab.Salary.Services;
+using ITLab.Salary.Services.Events;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -64,6 +66,18 @@ namespace ITLab.Salary.Backend
 
             services.AddSingleton<IDbFactory, ConcurrentDictionaryDbFactory>();
             services.AddTransient<EventSalaryContext>();
+
+            switch (Configuration.GetValue<EventsServiceType>(nameof(EventsServiceType)))
+            {
+                case EventsServiceType.SelfReferenced:
+                    services.AddScoped<IEventsService, SelfReferencedEventsService>();
+                    break;
+                case EventsServiceType.FromEventsApi:
+                    throw new NotImplementedException($"{nameof(EventsServiceType.FromEventsApi)} not implement");
+                default:
+                    throw new ApplicationException($"Incorrect {nameof(EventsServiceType)}");
+            }
+            services.AddScoped<IEventSalaryService, EventSalaryService>();
 
             services.AddAutoMapper(typeof(Requests));
 

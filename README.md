@@ -28,6 +28,7 @@ Example configuration file
 
   },
   "TESTS": true|false, // If TESTS mode enabled
+  "EventsServiceType": "SelfReferenced" | "FromEventsApi" self referenced - try to get needed info from internal db, from events api - send request to events service
 }
 ```
 

@@ -50,9 +50,12 @@ namespace ITLab.Salary.Database
                     .ToList();
         }
 
-        public Task<List<T>> GetAll<T>(Expression<Func<EventSalary, T>> projection)
+        public Task<List<T>> GetAll<T>(Expression<Func<EventSalary, bool>> filter, Expression<Func<EventSalary, T>> projection)
         {
-            return Collection.Find(Builders<EventSalary>.Filter.Empty).Project(projection).ToListAsync();
+            return Collection
+                .Find(filter)
+                .Project(projection)
+                .ToListAsync();
         }
 
         public async Task<EventSalary> GetOneOrDefault(Guid eventId)
