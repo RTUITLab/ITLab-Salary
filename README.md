@@ -15,7 +15,7 @@ test | [![master tests](https://img.shields.io/azure-devops/tests/RTUITLab/RTU%2
 
 Example configuration file
 
-```jsonc
+```js
 {
   "ConnectionStrings": {
     "MongoDb": "mongodb://localhost:27017/itlabsalarydevelop2" // connection string to mongodb
@@ -28,7 +28,12 @@ Example configuration file
 
   },
   "TESTS": true|false, // If TESTS mode enabled
-  "EventsServiceType": "SelfReferenced" | "FromEventsApi" self referenced - try to get needed info from internal db, from events api - send request to events service
+  "EventsServiceType": "SelfReferenced" | "FromEventsApi", // self referenced - try to get needed info from internal db, from events api - send request to events service
+  "RemoteApiEventsServiceOptions": {
+    "ClientSecret": "openid client secret",
+    "TokenUrl": "token url of identity server",
+    "BaseUrl": " base address of itlab events service"
+  }
 }
 ```
 

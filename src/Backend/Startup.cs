@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using AutoMapper;
+using IdentityModel.Client;
 using ITLab.Salary.Backend.Formatting;
 using ITLab.Salary.Backend.Models.Options;
 using ITLab.Salary.Backend.Services;
@@ -73,13 +74,35 @@ namespace ITLab.Salary.Backend
                     services.AddScoped<IEventsService, SelfReferencedEventsService>();
                     break;
                 case EventsServiceType.FromEventsApi:
-                    throw new NotImplementedException($"{nameof(EventsServiceType.FromEventsApi)} not implement");
+
+                    var options = Configuration
+                        .GetSection(nameof(RemoteApiEventsServiceOptions))
+                        .Get<RemoteApiEventsServiceOptions>();
+
+                    services.AddAccessTokenManagement(atmo =>
+                    {
+                        atmo.Client.Clients.Add("identityserver", new ClientCredentialsTokenRequest
+                        {
+                            Address = options.TokenUrl,
+                            ClientId = "itlab_salary",
+                            Scope = "itlab.events",
+                            ClientSecret = options.ClientSecret
+                        });
+                    });
+
+                    services.AddClientAccessTokenClient(RemoteApiEventsService.HttpClientName, configureClient: client =>
+                    {
+                        client.BaseAddress = new Uri(options.BaseUrl);
+                    });
+                    services.AddScoped<IEventsService, RemoteApiEventsService>();
+                    break;
                 default:
                     throw new ApplicationException($"Incorrect {nameof(EventsServiceType)}");
             }
             services.AddScoped<IEventSalaryService, EventSalaryService>();
 
             services.AddAutoMapper(typeof(Requests));
+
 
             JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
