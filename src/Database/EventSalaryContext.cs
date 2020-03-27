@@ -79,6 +79,7 @@ namespace ITLab.Salary.Database
                     .SetOnInsert(es => es.Created, eventSalary.Created)
                     .Set(es => es.ModificationDate, eventSalary.ModificationDate)
                     .Set(es => es.Count, eventSalary.Count)
+                    .Set(es => es.AuthorId, eventSalary.AuthorId)
                     .Set(es => es.Description, eventSalary.Description)
                     .Set(es => es.ShiftSalaries, eventSalary.ShiftSalaries)
                     .Set(es => es.PlaceSalaries, eventSalary.PlaceSalaries),
