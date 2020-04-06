@@ -8,6 +8,7 @@ using ITLab.Salary.Database;
 using ITLab.Salary.Models;
 using ITLab.Salary.PublicApi.Request.Salary;
 using ITLab.Salary.PublicApi.Response;
+using ITLab.Salary.Services;
 using ITLab.Salary.Shared.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -26,6 +27,7 @@ namespace ITLab.Salary.Backend.Controllers
     public class EventSalaryController : AuthorizedController
     {
         private readonly EventSalaryContext eventSalaryContext;
+        private readonly IEventSalaryService eventSalaryService;
         private readonly IMapper mapper;
         private readonly ILogger<EventSalaryController> logger;
 
@@ -33,28 +35,31 @@ namespace ITLab.Salary.Backend.Controllers
         /// Default constructor
         /// </summary>
         /// <param name="eventSalaryContext"></param>
+        /// <param name="eventSalaryService"></param>
         /// <param name="mapper"></param>
         /// <param name="logger"></param>
         public EventSalaryController(
             EventSalaryContext eventSalaryContext,
+            IEventSalaryService eventSalaryService,
             IMapper mapper,
             ILogger<EventSalaryController> logger)
         {
             this.eventSalaryContext = eventSalaryContext;
+            this.eventSalaryService = eventSalaryService;
             this.mapper = mapper;
             this.logger = logger;
         }
 
         /// <summary>
-        /// Get all event salary models
+        /// Get list of event salary
         /// </summary>
+        /// <param name="begin">Biggest end time. If not defined end time equals infinity</param>
+        /// <param name="end">Smallest begin time. If not defined begin time equals zero</param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<EventSalaryCompactView>>> GetList()
+        public async Task<ActionResult<IEnumerable<EventSalaryCompactView>>> GetList(DateTime? begin, DateTime? end)
         {
-            return await eventSalaryContext
-                .GetAll(es => new EventSalaryCompactView { Count = es.Count, Description = es.Description, EventId = es.EventId })
-                .ConfigureAwait(false);
+            return await eventSalaryService.Get(begin, end).ConfigureAwait(false);
         }
 
         /// <summary>

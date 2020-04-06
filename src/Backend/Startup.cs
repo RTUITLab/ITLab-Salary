@@ -6,12 +6,15 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using AutoMapper;
+using IdentityModel.Client;
 using ITLab.Salary.Backend.Formatting;
 using ITLab.Salary.Backend.Models.Options;
 using ITLab.Salary.Backend.Services;
 using ITLab.Salary.Backend.Services.Configure;
 using ITLab.Salary.Backend.Swagger;
 using ITLab.Salary.Database;
+using ITLab.Salary.Services;
+using ITLab.Salary.Services.Events;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -65,7 +68,41 @@ namespace ITLab.Salary.Backend
             services.AddSingleton<IDbFactory, ConcurrentDictionaryDbFactory>();
             services.AddTransient<EventSalaryContext>();
 
+            switch (Configuration.GetValue<EventsServiceType>(nameof(EventsServiceType)))
+            {
+                case EventsServiceType.SelfReferenced:
+                    services.AddScoped<IEventsService, SelfReferencedEventsService>();
+                    break;
+                case EventsServiceType.FromEventsApi:
+
+                    var options = Configuration
+                        .GetSection(nameof(RemoteApiEventsServiceOptions))
+                        .Get<RemoteApiEventsServiceOptions>();
+
+                    services.AddAccessTokenManagement(atmo =>
+                    {
+                        atmo.Client.Clients.Add("identityserver", new ClientCredentialsTokenRequest
+                        {
+                            Address = options.TokenUrl,
+                            ClientId = "itlab_salary",
+                            Scope = "itlab.events",
+                            ClientSecret = options.ClientSecret
+                        });
+                    });
+
+                    services.AddClientAccessTokenClient(RemoteApiEventsService.HttpClientName, configureClient: client =>
+                    {
+                        client.BaseAddress = new Uri(options.BaseUrl);
+                    });
+                    services.AddScoped<IEventsService, RemoteApiEventsService>();
+                    break;
+                default:
+                    throw new ApplicationException($"Incorrect {nameof(EventsServiceType)}");
+            }
+            services.AddScoped<IEventSalaryService, EventSalaryService>();
+
             services.AddAutoMapper(typeof(Requests));
+
 
             JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
