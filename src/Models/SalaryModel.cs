@@ -8,5 +8,6 @@ namespace ITLab.Salary.Models
     {
         public int Count { get; set; }
         public string Description { get; set; }
+        public DateTime Created { get; set; }
     }
 }

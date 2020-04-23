@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using ITLab.Salary.Database;
-using ITLab.Salary.Models;
+using ITLab.Salary.Models.Events;
 using ITLab.Salary.PublicApi.Request.Salary;
 using ITLab.Salary.PublicApi.Response;
 using ITLab.Salary.Services;

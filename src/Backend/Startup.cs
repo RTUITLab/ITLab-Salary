@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using AutoMapper;
 using IdentityModel.Client;
+using ITLab.Salary.Backend.Authorization;
 using ITLab.Salary.Backend.Formatting;
 using ITLab.Salary.Backend.Models.Options;
 using ITLab.Salary.Backend.Services;
@@ -55,18 +56,11 @@ namespace ITLab.Salary.Backend
         {
             services.Configure<JwtOptions>(Configuration.GetSection(nameof(JwtOptions)));
 
-            services.AddControllers(options =>
-            {
-                var policy = new AuthorizationPolicyBuilder()
-                     .RequireAuthenticatedUser()
-                     .AddAuthenticationSchemes("Bearer")
-                     .RequireClaim("scope", Configuration.GetSection(nameof(JwtOptions)).GetValue<string>(nameof(JwtOptions.Scope)))
-                     .Build();
-                options.Filters.Add(new AuthorizeFilter(policy));
-            });
+            services.AddControllers();
 
             services.AddSingleton<IDbFactory, ConcurrentDictionaryDbFactory>();
             services.AddTransient<EventSalaryContext>();
+            services.AddTransient<ReportSalaryContext>();
 
             switch (Configuration.GetValue<EventsServiceType>(nameof(EventsServiceType)))
             {
@@ -106,6 +100,7 @@ namespace ITLab.Salary.Backend
 
             JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+            
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -129,6 +124,17 @@ namespace ITLab.Salary.Backend
                         options.TokenValidationParameters.ValidateLifetime = true;
                     }
                 });
+
+            services.AddAuthorization(options =>
+            {
+                var defaultPolicy = new AuthorizationPolicyBuilder()
+                     .RequireClaim("scope", "itlab.salary")
+                     .RequireClaim("itlab", "user")
+                     .RequireClaim("sub")
+                     .Build();
+                options.DefaultPolicy = defaultPolicy;
+                options.AddPolicy(PolicyNames.ReportsAdmin, policy => policy.RequireClaim("itlab", "reports.admin"));
+            });
 
             services.AddApiVersioning(
                 options =>

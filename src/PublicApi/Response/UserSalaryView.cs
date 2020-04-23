@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ITLab.Salary.Models
+namespace ITLab.Salary.PublicApi.Response
 {
-    public class UserSalary : MetaSalary
+    public class UserSalaryView : SalaryView
     {
-        public Guid UserId { get; set; }
         public DateTime Approved { get; set; }
         public Guid ApproverId { get; set; }
     }
