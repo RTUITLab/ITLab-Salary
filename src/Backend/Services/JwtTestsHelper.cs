@@ -35,7 +35,10 @@ namespace ITLab.Salary.Backend.Services
             var claims = new Claim[] {
                 new Claim("sub", jwtOptions.DebugAdminUserId.ToString()),
                 new Claim("aud", jwtOptions.Audience),
-                new Claim("scope", jwtOptions.Scope)
+                new Claim("scope", jwtOptions.Scope),
+                new Claim("itlab", "user"),
+                new Claim("itlab", "reports.admin"),
+                new Claim("itlab", "salary.admin"),
             };
             var jwt = new JwtSecurityToken(claims: claims, signingCredentials: credentials);
             return new JwtSecurityTokenHandler().WriteToken(jwt);

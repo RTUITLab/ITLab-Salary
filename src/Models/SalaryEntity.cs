@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ITLab.Salary.Models
 {
-    public class RootSalary : MetaSalary
+    public class SalaryEntity : MetaSalary
     {
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }

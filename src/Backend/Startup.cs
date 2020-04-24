@@ -7,14 +7,16 @@ using System.Reflection;
 using System.Threading.Tasks;
 using AutoMapper;
 using IdentityModel.Client;
-using ITLab.Salary.Backend.Formatting;
+using ITLab.Salary.Backend.Authorization;
 using ITLab.Salary.Backend.Models.Options;
 using ITLab.Salary.Backend.Services;
 using ITLab.Salary.Backend.Services.Configure;
 using ITLab.Salary.Backend.Swagger;
 using ITLab.Salary.Database;
-using ITLab.Salary.Services;
+using ITLab.Salary.Mappings;
 using ITLab.Salary.Services.Events;
+using ITLab.Salary.Services.Events.Remote;
+using ITLab.Salary.Services.Reports;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -55,18 +57,11 @@ namespace ITLab.Salary.Backend
         {
             services.Configure<JwtOptions>(Configuration.GetSection(nameof(JwtOptions)));
 
-            services.AddControllers(options =>
-            {
-                var policy = new AuthorizationPolicyBuilder()
-                     .RequireAuthenticatedUser()
-                     .AddAuthenticationSchemes("Bearer")
-                     .RequireClaim("scope", Configuration.GetSection(nameof(JwtOptions)).GetValue<string>(nameof(JwtOptions.Scope)))
-                     .Build();
-                options.Filters.Add(new AuthorizeFilter(policy));
-            });
+            services.AddControllers();
 
             services.AddSingleton<IDbFactory, ConcurrentDictionaryDbFactory>();
             services.AddTransient<EventSalaryContext>();
+            services.AddTransient<ReportSalaryContext>();
 
             switch (Configuration.GetValue<EventsServiceType>(nameof(EventsServiceType)))
             {
@@ -100,17 +95,18 @@ namespace ITLab.Salary.Backend
                     throw new ApplicationException($"Incorrect {nameof(EventsServiceType)}");
             }
             services.AddScoped<IEventSalaryService, EventSalaryService>();
+            services.AddScoped<IReportSalaryService, GetAllReportSalaryService>();
 
             services.AddAutoMapper(typeof(Requests));
 
 
             JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
                     var jwtOptions = Configuration.GetSection(nameof(JwtOptions)).Get<JwtOptions>();
-
 
 
                     options.Audience = jwtOptions.Audience;
@@ -129,6 +125,19 @@ namespace ITLab.Salary.Backend
                         options.TokenValidationParameters.ValidateLifetime = true;
                     }
                 });
+
+            services.AddAuthorization(options =>
+            {
+                var defaultPolicy = new AuthorizationPolicyBuilder()
+                     .RequireClaim("scope", "itlab.salary")
+                     .RequireClaim("itlab", "user")
+                     .RequireClaim("sub")
+                     .Build();
+                options.DefaultPolicy = defaultPolicy;
+
+                options.AddSalaryAdminPolicy();
+                options.AddReportsAdminPolicy();
+            });
 
             services.AddApiVersioning(
                 options =>

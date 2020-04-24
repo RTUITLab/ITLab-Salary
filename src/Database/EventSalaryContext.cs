@@ -5,43 +5,25 @@ using System.Collections.Generic;
 using System.Text;
 using MongoDB.Bson;
 using MongoDB.Driver.Core.Events;
-using ITLab.Salary.Models;
 using System.Threading.Tasks;
 using System.Linq.Expressions;
 using ITLab.Salary.Shared.Exceptions;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
+using ITLab.Salary.Models.Events;
 
 namespace ITLab.Salary.Database
 {
-    public class EventSalaryContext
+    public class EventSalaryContext : MongoDbContext<EventSalary>
     {
-        public const string EventSalaryCollectionName = nameof(EventSalary);
-        public const string EventSalaryHistoryCollectionName = nameof(EventSalary) + "_History";
 
-        private readonly IMongoDatabase mongoDatabase;
         private readonly ILogger<EventSalaryContext> logger;
 
-        public EventSalaryContext(IDbFactory dbFactory, ILogger<EventSalaryContext> logger)
+        public EventSalaryContext(IDbFactory dbFactory, ILogger<EventSalaryContext> logger) : base(dbFactory)
         {
-            dbFactory = dbFactory ?? throw new ArgumentNullException(nameof(dbFactory));
-            mongoDatabase = dbFactory.GetDatabase<EventSalaryContext>();
             this.logger = logger;
         }
-
-        private IMongoCollection<EventSalary> Collection => mongoDatabase.GetCollection<EventSalary>(EventSalaryCollectionName);
-        private IMongoCollection<HistoryRecord<EventSalary>> History => mongoDatabase.GetCollection<HistoryRecord<EventSalary>>(EventSalaryHistoryCollectionName);
-        private Task SaveToHistory(EventSalary eventSalary, HistoryRecordType historyType = HistoryRecordType.Update)
-        {
-            return History.InsertOneAsync(new HistoryRecord<EventSalary>
-            {
-                SavedDate = DateTime.UtcNow,
-                Object = eventSalary,
-                Type = historyType
-            });
-        }
-
 
         public async Task<List<EventSalary>> GetAll()
         {

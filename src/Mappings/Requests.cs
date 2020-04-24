@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
 using ITLab.Salary.Models;
+using ITLab.Salary.Models.Events;
+using ITLab.Salary.Models.Reports;
 using ITLab.Salary.PublicApi.Request.Salary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ITLab.Salary.Backend.Formatting
+namespace ITLab.Salary.Mappings
 {
     /// <summary>
     /// Automapper profile for requests
@@ -24,6 +26,8 @@ namespace ITLab.Salary.Backend.Formatting
             CreateMap<PlaceSalaryEdit, PlaceSalary>();
             CreateMap<ShiftSalaryEdit, ShiftSalary>();
             CreateMap<EventSalaryCreateEdit, EventSalary>();
+
+            CreateMap<ReportUserSalaryEdit, ReportUserSalary>();
         }
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ITLab.Salary.Models
+namespace ITLab.Salary.Models.Events
 {
     public class ShiftSalary : SalaryModel
     {

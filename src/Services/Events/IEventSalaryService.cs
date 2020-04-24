@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace ITLab.Salary.Services
+namespace ITLab.Salary.Services.Events
 {
     public interface IEventSalaryService
     {
