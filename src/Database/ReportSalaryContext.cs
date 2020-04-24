@@ -2,6 +2,7 @@
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,9 +14,9 @@ namespace ITLab.Salary.Database
         {
         }
 
-        public Task<List<ReportUserSalary>> GetAll()
+        public Task<List<T>> GetAll<T>(Expression<Func<ReportUserSalary, T>> projection)
         {
-            return Collection.Find(Builders<ReportUserSalary>.Filter.Empty).ToListAsync();
+            return Collection.Find(Builders<ReportUserSalary>.Filter.Empty).Project(projection).ToListAsync();
         }
 
         public async Task<ReportUserSalary> UpdateReportUserSalary(string reportId, ReportUserSalary reportUserSalary, Guid approverId)

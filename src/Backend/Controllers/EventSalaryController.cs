@@ -8,7 +8,7 @@ using ITLab.Salary.Database;
 using ITLab.Salary.Models.Events;
 using ITLab.Salary.PublicApi.Request.Salary;
 using ITLab.Salary.PublicApi.Response;
-using ITLab.Salary.Services;
+using ITLab.Salary.Services.Events;
 using ITLab.Salary.Shared.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

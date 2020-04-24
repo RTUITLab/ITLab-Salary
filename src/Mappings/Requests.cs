@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ITLab.Salary.Backend.Formatting
+namespace ITLab.Salary.Mappings
 {
     /// <summary>
     /// Automapper profile for requests

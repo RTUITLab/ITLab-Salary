@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using ITLab.Salary.Backend.Authorization;
 using ITLab.Salary.Database;
 using ITLab.Salary.Models.Reports;
 using ITLab.Salary.PublicApi.Request.Salary;
 using ITLab.Salary.PublicApi.Response.Report;
+using ITLab.Salary.Services.Reports;
 using ITLab.Salary.Shared.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -12,6 +14,8 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 
 namespace ITLab.Salary.Backend.Controllers
@@ -25,6 +29,8 @@ namespace ITLab.Salary.Backend.Controllers
     public class ReportSalaryController : AuthorizedController
     {
         private readonly ReportSalaryContext reportSalaryContext;
+        private readonly IReportSalaryService reportSalaryService;
+        private readonly IAuthorizationService authorizationService;
         private readonly IMapper mapper;
         private readonly ILogger<ReportSalaryController> logger;
 
@@ -32,14 +38,20 @@ namespace ITLab.Salary.Backend.Controllers
         /// Default constructor
         /// </summary>
         /// <param name="reportSalaryContext"></param>
+        /// <param name="reportSalaryService"></param>
+        /// <param name="authorizationService"></param>
         /// <param name="mapper"></param>
         /// <param name="logger"></param>
         public ReportSalaryController(
             ReportSalaryContext reportSalaryContext,
+            IReportSalaryService reportSalaryService,
+            IAuthorizationService authorizationService,
             IMapper mapper,
             ILogger<ReportSalaryController> logger)
         {
             this.reportSalaryContext = reportSalaryContext;
+            this.reportSalaryService = reportSalaryService;
+            this.authorizationService = authorizationService;
             this.mapper = mapper;
             this.logger = logger;
         }
@@ -47,19 +59,20 @@ namespace ITLab.Salary.Backend.Controllers
         /// <summary>
         /// Get list of report salary
         /// </summary>
-        /// <param name="begin">Biggest end time. If not defined end time equals infinity</param>
-        /// <param name="end">Smallest begin time. If not defined begin time equals zero</param>
         /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<ReportUserSalaryCompactView>>> GetList(DateTime? begin, DateTime? end)
+        [HttpGet("user/{userId}")]
+        public async Task<ActionResult<List<ReportUserSalaryCompactView>>> GetList(Guid userId)
         {
-            var list = await reportSalaryContext.GetAll().ConfigureAwait(false);
-            return list.Select(s => new ReportUserSalaryCompactView
+            if (UserId != userId)
             {
-                ReportId = s.ReportId,
-                Count = s.Count,
-                Description = s.Description
-            }).ToList();
+                var adminAuthorize = await authorizationService.AuthorizeAsync(User, PolicyNames.SalaryAdmin).ConfigureAwait(false);
+                if (!adminAuthorize.Succeeded)
+                {
+                    return StatusCode((int)HttpStatusCode.Forbidden, "require salary admin permissons");
+                }
+            }
+
+            return await reportSalaryService.GetReportSalaryForUser(UserId).ConfigureAwait(false);
         }
 
         ///// <summary>
@@ -71,7 +84,7 @@ namespace ITLab.Salary.Backend.Controllers
         ///// <returns></returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpPut("{reportId}")]
-        [Authorize(Policy = PolicyNames.ReportsAdmin)]
+        [Authorize(Policy = PolicyNames.SalaryAdmin)]
         public async Task<ActionResult<ReportUserSalaryFullView>> UpdateEventSalaryInfo(
             string reportId,
             [FromBody] ReportUserSalaryEdit info)

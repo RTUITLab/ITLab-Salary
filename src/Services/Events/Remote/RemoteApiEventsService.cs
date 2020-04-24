@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace ITLab.Salary.Services.Events
+namespace ITLab.Salary.Services.Events.Remote
 {
     public class RemoteApiEventsService : IEventsService
     {
