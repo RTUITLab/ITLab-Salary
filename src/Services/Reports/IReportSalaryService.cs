@@ -8,6 +8,6 @@ namespace ITLab.Salary.Services.Reports
 {
     public interface IReportSalaryService
     {
-        Task<List<ReportUserSalaryCompactView>> GetReportSalaryForUser(Guid userId);
+        Task<List<ReportUserSalaryFullView>> GetReportSalaryForUser(Guid userId);
     }
 }

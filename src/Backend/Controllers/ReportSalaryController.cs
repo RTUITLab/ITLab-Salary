@@ -61,7 +61,7 @@ namespace ITLab.Salary.Backend.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("user/{userId}")]
-        public async Task<ActionResult<List<ReportUserSalaryCompactView>>> GetList(Guid userId)
+        public async Task<ActionResult<List<ReportUserSalaryFullView>>> GetList(Guid userId)
         {
             if (UserId != userId)
             {

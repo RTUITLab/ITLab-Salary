@@ -28,9 +28,9 @@ namespace ITLab.Salary.Services.Reports
             this.logger = logger;
         }
 
-        public Task<List<ReportUserSalaryCompactView>> GetReportSalaryForUser(Guid userId)
+        public Task<List<ReportUserSalaryFullView>> GetReportSalaryForUser(Guid userId)
         {
-            var expression = mapper.ConfigurationProvider.ExpressionBuilder.GetMapExpression<ReportUserSalary, ReportUserSalaryCompactView>();
+            var expression = mapper.ConfigurationProvider.ExpressionBuilder.GetMapExpression<ReportUserSalary, ReportUserSalaryFullView>();
             return reportSalaryContext.GetAll(expression);
         }
     }
