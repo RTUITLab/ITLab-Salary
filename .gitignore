@@ -343,3 +343,5 @@ tests/e2e/out/
 tests/e2e/salary-api/itlab-salary-build/
 
 src/Backend/appsettings.Secret.json
+
+deploy/itlab-salary-build
