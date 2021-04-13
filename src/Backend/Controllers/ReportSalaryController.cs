@@ -72,7 +72,7 @@ namespace ITLab.Salary.Backend.Controllers
                 }
             }
 
-            return await reportSalaryService.GetReportSalaryForUser(UserId).ConfigureAwait(false);
+            return await reportSalaryService.GetReportSalaryForUser(userId).ConfigureAwait(false);
         }
 
         ///// <summary>

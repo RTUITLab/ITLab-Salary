@@ -16,7 +16,7 @@ namespace ITLab.Salary.Backend.MongoMigrations
     public class ReportsMigration : MongoMigration
     {
         public override Guid Id => Guid.Parse("D593B002-9B7A-400A-A492-BCCA535B2F72");
-        public override DateTime MigrationDate => DateTime.Parse("23.04.2020 11:36:50", null, DateTimeStyles.AssumeUniversal);
+        public override DateTime MigrationDate => DateTime.ParseExact("23.04.2020 11:36:50", "dd.MM.yyyy HH:mm:ss", null);
 
         public override string Name => "Reports migration";
 
