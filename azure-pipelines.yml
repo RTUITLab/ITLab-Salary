@@ -45,7 +45,7 @@ stages:
         artifact: itlab-salary-build
 - stage: packDocker
   displayName: pack Docker image
-  condition: ${{variables.buildImage}}
+  condition: and(succeeded(), ${{variables.buildImage}})
   jobs:
   - job: packBuild
     steps:
@@ -61,7 +61,7 @@ stages:
           tags: ${{variables.imageTags}}
 - stage: deploy
   displayName: Deploy
-  condition: ${{variables.deployService}}
+  condition: and(succeeded(), ${{variables.deployService}})
   jobs:
     - deployment: Deploy
       pool:
