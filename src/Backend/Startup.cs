@@ -95,7 +95,16 @@ namespace ITLab.Salary.Backend
                     throw new ApplicationException($"Incorrect {nameof(EventsServiceType)}");
             }
             services.AddScoped<IEventSalaryService, EventSalaryService>();
-            services.AddScoped<IReportSalaryService, GetAllReportSalaryService>();
+
+            services.AddHttpClient(WithReportsApiSalaryService.HTTP_CLIENT_NAME, client =>
+            {
+                var options = Configuration
+                                .GetSection(nameof(RemoteApiReportsServiceOptions))
+                                .Get<RemoteApiReportsServiceOptions>();
+
+                client.BaseAddress = new Uri(options.BaseUrl);
+            });
+            services.AddScoped<IReportSalaryService, WithReportsApiSalaryService>();
 
             services.AddAutoMapper(typeof(Requests));
 
