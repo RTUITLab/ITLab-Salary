@@ -33,5 +33,10 @@ namespace ITLab.Salary.Services.Reports
             var expression = mapper.ConfigurationProvider.ExpressionBuilder.GetMapExpression<ReportUserSalary, ReportUserSalaryFullView>();
             return reportSalaryContext.GetAll(expression);
         }
+
+        public Task<List<ReportUserSalaryFullView>> GetReportSalaryForUser(Guid userId, string invokerAccessToken)
+        {
+            return GetReportSalaryForUser(userId);
+        }
     }
 }

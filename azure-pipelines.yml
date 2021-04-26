@@ -1,66 +1,79 @@
-trigger:
-  - master
-  - develop
-
 name: $(BuildID)-$(Build.SourceBranchName)
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  ${{ if notIn(variables['Build.SourceBranchName'], 'master', 'develop') }}:
+    buildImage: false
+    deployService: false
+    deployEnvironment: 'no'
+    imageTags: 'no'
+    serviceName: 'no'
+  ${{ if eq(variables['Build.SourceBranchName'], 'develop') }}:
+    buildImage: true
+    deployService: true
+    deployEnvironment: development
+    imageTags: |
+      $(Build.BuildId)
+      develop
+    serviceName: itlab-develop_salary
+  ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
+    buildImage: true
+    deployService: true
+    deployEnvironment: production
+    imageTags: |
+      $(Build.BuildId)
+      latest
+    serviceName: itlab_salary
 
 stages:
 - stage: build
-
+  displayName: Build
   jobs:
-  - job: build_salary_api
-    pool:
-      vmImage: ubuntu-latest
+  - job: buildApi
     steps:
-    - checkout: self
-      clean: true
-      fetchDepth: 1
-    - task: UseDotNet@2
-      displayName: ".NET Core 3.1.x"
-      inputs:
-        packageType: 'sdk'
-        version: '3.1.x'
-    - task: DotNetCoreCLI@2
-      displayName: dotnet restore
-      inputs:
-        command: restore
-        arguments: --source https://api.nuget.org/v3/index.json
-
-    - task: DotNetCoreCLI@2
-      displayName: dotnet publish
-      inputs:
-        command: publish
-        publishWebProjects: false
-        projects: src/Backend/Backend.csproj
-        arguments: -o $(Build.ArtifactStagingDirectory) -c Release --no-restore
-        zipAfterPublish: false
-        modifyOutputPath: false
-
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish Artifact: itlab-salary-build'
-      inputs:
-        ArtifactName: 'itlab-salary-build'
-
-  - job: publish_deploy_artifacts
-    pool:
-      vmImage: ubuntu-latest
+      - task: Bash@3
+        displayName: Build
+        inputs:
+          filePath: 'build.sh'
+      - publish: deploy
+        artifact: itlab-salary-build
+- stage: packDocker
+  displayName: pack Docker image
+  condition: and(succeeded(), ${{variables.buildImage}})
+  jobs:
+  - job: packBuild
     steps:
-    - checkout: self
-      clean: true
-      fetchDepth: 1
-
-    - task: CopyFiles@2
-      displayName: 'copy deploy artifact'
-      inputs:
-        SourceFolder: 'deploy'
-        Contents: '**'
-        TargetFolder: '$(Build.ArtifactStagingDirectory)'
-        CleanTargetFolder: true
-
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish Artifact: itlab-salary-deploy'
-      inputs:
-        ArtifactName: 'itlab-salary-deploy'
+      - download: current
+        artifact: itlab-salary-build
+      - task: Docker@2
+        inputs:
+          containerRegistry: 'rtuitlab connection by admin'
+          repository: 'rtuitlab/salary'
+          command: 'buildAndPush'
+          Dockerfile: '$(Pipeline.Workspace)/itlab-salary-build/Dockerfile'
+          buildContext: '$(Pipeline.Workspace)/itlab-salary-build'
+          tags: ${{variables.imageTags}}
+- stage: deploy
+  displayName: Deploy
+  condition: and(succeeded(), ${{variables.deployService}})
+  jobs:
+    - deployment: Deploy
+      pool:
+        vmImage: 'ubuntu-latest'
+      environment: ${{variables.deployEnvironment}}
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - download: none
+              - task: SSH@0
+                inputs:
+                  sshEndpoint: 'swarm manager'
+                  runOptions: 'commands'
+                  commands: 'docker service update --image rtuitlab/salary:$(Build.BuildId) ${{variables.serviceName}} --with-registry-auth'
+                  readyTimeout: '20000'
 # - stage: test
 
 #   jobs:

@@ -19,6 +19,11 @@ namespace ITLab.Salary.Database
             return Collection.Find(Builders<ReportUserSalary>.Filter.Empty).Project(projection).ToListAsync();
         }
 
+        public Task<List<T>> GetById<T>(Expression<Func<ReportUserSalary, T>> projection, List<string> targetIds)
+        {
+            return Collection.Find(Builders<ReportUserSalary>.Filter.Where(r => targetIds.Contains(r.ReportId))).Project(projection).ToListAsync();
+        }
+
         public async Task<ReportUserSalary> UpdateReportUserSalary(string reportId, ReportUserSalary reportUserSalary, Guid approverId)
         {
             reportUserSalary = reportUserSalary ?? throw new ArgumentNullException(nameof(reportUserSalary));
