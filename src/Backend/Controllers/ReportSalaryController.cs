@@ -75,7 +75,7 @@ namespace ITLab.Salary.Backend.Controllers
             }
             if (adminAuthorize.Succeeded)
             {
-                await reportSalaryService.GetAllSalaryInfo().ConfigureAwait(false);
+                return await reportSalaryService.GetAllSalaryInfo().ConfigureAwait(false);
             }
 
             return await reportSalaryService.GetReportSalaryForUser(userId, Request.Headers["Authorization"].ToString().Split(' ')[1]).ConfigureAwait(false);
