@@ -28,15 +28,20 @@ namespace ITLab.Salary.Services.Reports
             this.logger = logger;
         }
 
-        public Task<List<ReportUserSalaryFullView>> GetReportSalaryForUser(Guid userId)
+        public Task<List<ReportUserSalaryFullView>> GetAllSalaryInfo()
         {
             var expression = mapper.ConfigurationProvider.ExpressionBuilder.GetMapExpression<ReportUserSalary, ReportUserSalaryFullView>();
             return reportSalaryContext.GetAll(expression);
         }
 
+        public Task<List<ReportUserSalaryFullView>> GetReportSalaryForUser(Guid userId)
+        {
+            return GetAllSalaryInfo();
+        }
+
         public Task<List<ReportUserSalaryFullView>> GetReportSalaryForUser(Guid userId, string invokerAccessToken)
         {
-            return GetReportSalaryForUser(userId);
+            return GetAllSalaryInfo();
         }
     }
 }

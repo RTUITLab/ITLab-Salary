@@ -63,13 +63,19 @@ namespace ITLab.Salary.Backend.Controllers
         [HttpGet("user/{userId}")]
         public async Task<ActionResult<List<ReportUserSalaryFullView>>> GetList(Guid userId)
         {
+            var adminAuthorize = await authorizationService.AuthorizeAsync(User, PolicyNames.SalaryAdmin).ConfigureAwait(false);
+            
+
             if (UserId != userId)
             {
-                var adminAuthorize = await authorizationService.AuthorizeAsync(User, PolicyNames.SalaryAdmin).ConfigureAwait(false);
                 if (!adminAuthorize.Succeeded)
                 {
                     return StatusCode((int)HttpStatusCode.Forbidden, "require salary admin permissons");
                 }
+            }
+            if (adminAuthorize.Succeeded)
+            {
+                await reportSalaryService.GetAllSalaryInfo().ConfigureAwait(false);
             }
 
             return await reportSalaryService.GetReportSalaryForUser(userId, Request.Headers["Authorization"].ToString().Split(' ')[1]).ConfigureAwait(false);
