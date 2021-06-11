@@ -48,8 +48,18 @@ stages:
       - download: current
         artifact: itlab-salary-build
       - task: Docker@2
+        displayName: Build image for docker hub
         inputs:
           containerRegistry: 'rtuitlab connection by admin'
+          repository: 'rtuitlab/salary'
+          command: 'buildAndPush'
+          Dockerfile: '$(Pipeline.Workspace)/itlab-salary-build/Dockerfile'
+          buildContext: '$(Pipeline.Workspace)/itlab-salary-build'
+          tags: ${{variables.imageTags}}
+      - task: Docker@2
+        displayName: Build image private docker registry
+        inputs:
+          containerRegistry: 'private rtuitlab registry'
           repository: 'rtuitlab/salary'
           command: 'buildAndPush'
           Dockerfile: '$(Pipeline.Workspace)/itlab-salary-build/Dockerfile'
@@ -72,7 +82,7 @@ stages:
                 inputs:
                   sshEndpoint: 'swarm manager'
                   runOptions: 'commands'
-                  commands: 'docker service update --image rtuitlab/salary:$(Build.BuildId) ${{variables.serviceName}} --with-registry-auth'
+                  commands: 'docker service update --image registry.rtuitlab.dev/rtuitlab/salary:$(Build.BuildId) ${{variables.serviceName}} --with-registry-auth'
                   readyTimeout: '20000'
 # - stage: test
 
